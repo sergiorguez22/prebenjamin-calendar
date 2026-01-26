@@ -911,19 +911,49 @@
                 const arrayBuffer = await file.arrayBuffer();
                 const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
                 
-                // Extraer texto de todas las páginas
-                let fullText = '';
+                // Extraer texto CON POSICIONES para reconstruir la tabla
+                let allItems = [];
+                
                 for (let i = 1; i <= pdf.numPages; i++) {
                     const page = await pdf.getPage(i);
                     const textContent = await page.getTextContent();
-                    const pageText = textContent.items.map(item => item.str).join(' ');
-                    fullText += pageText + '\n';
+                    
+                    textContent.items.forEach(item => {
+                        if (item.str.trim()) {
+                            allItems.push({
+                                text: item.str.trim(),
+                                x: Math.round(item.transform[4]),
+                                y: Math.round(item.transform[5]),
+                                page: i
+                            });
+                        }
+                    });
                 }
                 
-                console.log('Texto extraído del PDF:', fullText);
+                console.log('Items extraídos:', allItems.length);
                 
-                // Buscar la fila de Prebenjamin B
-                const trainings = extractPrebenjaminB(fullText);
+                // Buscar "Prebenjamin B" y obtener su posición Y
+                const prebItem = allItems.find(item => 
+                    item.text.toLowerCase().includes('prebenjamin b') || 
+                    item.text.toLowerCase() === 'prebenjamin b'
+                );
+                
+                if (!prebItem) {
+                    toast('No se encontró "Prebenjamin B" en el PDF');
+                    return;
+                }
+                
+                console.log('Prebenjamin B encontrado en:', prebItem);
+                
+                // Buscar todos los items que están en la MISMA FILA (similar Y, tolerancia de 15px)
+                const rowItems = allItems.filter(item => 
+                    Math.abs(item.y - prebItem.y) < 15 && item.page === prebItem.page
+                ).sort((a, b) => a.x - b.x);
+                
+                console.log('Items en la fila de Prebenjamin B:', rowItems.map(i => i.text));
+                
+                // Extraer entrenamientos de esta fila
+                const trainings = extractTrainingsFromRow(rowItems);
                 
                 if (trainings.length === 0) {
                     toast('No se encontraron entrenamientos del Prebenjamín B');
@@ -932,10 +962,10 @@
                 
                 importedData = trainings;
                 
-                // Mostrar preview
                 let html = '';
                 trainings.forEach(t => {
-                    html += '<tr><td>' + t.day + '</td><td>' + t.time + '</td><td>' + t.field + '</td></tr>';
+                    const tipo = t.isMatch ? ' (Partido)' : '';
+                    html += '<tr><td>' + t.day + tipo + '</td><td>' + t.time + '</td><td>' + t.field + '</td></tr>';
                 });
                 document.getElementById('previewBody').innerHTML = html;
                 document.getElementById('preview').classList.add('show');
@@ -946,61 +976,50 @@
             }
         }
 
-        function extractPrebenjaminB(text) {
+        function extractTrainingsFromRow(rowItems) {
             const trainings = [];
-            const dayNames = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+            const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
             const dayNums = [1, 2, 3, 4, 5, 6, 0];
             
-            // Normalizar texto
-            const normalized = text.replace(/\s+/g, ' ');
+            // Unir todo el texto de la fila
+            const rowText = rowItems.map(i => i.text).join(' ');
+            console.log('Texto de la fila:', rowText);
             
-            // Buscar "Prebenjamin B" seguido de sus datos hasta "Debutante"
-            // El patrón en el PDF es: Prebenjamin B [datos lunes] [datos martes] ... Debutante
-            const prebRegex = /Prebenjamin\s*B\s+([\s\S]*?)(?=Debutante|Genuine|$)/i;
-            const match = normalized.match(prebRegex);
-            
-            if (!match) {
-                console.log('No se encontró sección Prebenjamin B');
-                return trainings;
-            }
-            
-            const section = match[1];
-            console.log('Sección Prebenjamin B:', section);
-            
-            // Buscar todos los patrones de entrenamiento: "Entrenamiento Campo X-X Hora: HH:MM"
+            // Buscar patrones de entrenamiento: "Entrenamiento Campo X-Y Hora: HH:MM"
             const regex = /Entrenamiento\s+Campo\s+(\d+)\s*-?\s*([A-Za-z]?)\s+Hora:\s*(\d{1,2}):(\d{2})/gi;
-            let m;
+            let match;
             let dayIndex = 0;
             
-            while ((m = regex.exec(section)) !== null && dayIndex < 7) {
-                const campo = m[1] + (m[2] ? '-' + m[2].toUpperCase() : '');
-                const hora = m[3].padStart(2, '0') + ':' + m[4];
+            while ((match = regex.exec(rowText)) !== null) {
+                const field = match[1] + (match[2] ? '-' + match[2].toUpperCase() : '');
+                const time = match[3].padStart(2, '0') + ':' + match[4];
                 
                 trainings.push({
-                    day: dayNames[dayIndex],
-                    dayNum: dayNums[dayIndex],
-                    time: hora,
-                    field: campo
+                    day: days[dayIndex] || 'Día ' + (dayIndex + 1),
+                    dayNum: dayNums[dayIndex] || (dayIndex % 7),
+                    time: time,
+                    field: field,
+                    isMatch: false
                 });
                 dayIndex++;
             }
             
-            // También buscar partidos (Jornada)
-            const jornadaRegex = /Jornada\s+\d+\s+([^|]+?)(?:Campo\s+(\d+\s*-?\s*[A-Za-z]?)\s*\|?\s*Hora:\s*(\d{1,2}):(\d{2}))?/gi;
-            let jm;
-            while ((jm = jornadaRegex.exec(section)) !== null) {
-                if (jm[2] && jm[3]) {
-                    const campo = jm[2].replace(/\s+/g, '').toUpperCase();
-                    const hora = jm[3].padStart(2, '0') + ':' + jm[4];
-                    // Los partidos suelen ser sábado
-                    trainings.push({
-                        day: 'Sábado (Partido)',
-                        dayNum: 6,
-                        time: hora,
-                        field: campo,
-                        isMatch: true
-                    });
-                }
+            // Buscar partidos (Jornada)
+            const jornadaRegex = /Jornada\s+(\d+)\s+([^C]*?)Campo\s+(\d+)\s*-?\s*([A-Za-z]?)\s*[\|]?\s*Hora:\s*(\d{1,2}):(\d{2})/gi;
+            let jMatch;
+            
+            while ((jMatch = jornadaRegex.exec(rowText)) !== null) {
+                const field = jMatch[3] + (jMatch[4] ? '-' + jMatch[4].toUpperCase() : '');
+                const time = jMatch[5].padStart(2, '0') + ':' + jMatch[6];
+                
+                trainings.push({
+                    day: 'Sábado',
+                    dayNum: 6,
+                    time: time,
+                    field: field,
+                    isMatch: true,
+                    opponent: jMatch[2].trim()
+                });
             }
             
             return trainings;
