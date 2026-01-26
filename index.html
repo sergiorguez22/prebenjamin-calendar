@@ -605,10 +605,10 @@
         .player-card {
             background: var(--cream);
             border: 1px solid var(--gray-light);
-            padding: 20px;
+            padding: 16px;
             display: flex;
-            align-items: center;
-            gap: 16px;
+            align-items: flex-start;
+            gap: 12px;
             transition: border-color 0.2s, transform 0.2s;
         }
         .player-card:hover {
@@ -617,14 +617,36 @@
         }
         .player-number {
             font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.5rem;
-            color: var(--gold);
-            min-width: 45px;
+            font-size: 1.3rem;
+            background: var(--gold);
+            color: var(--black);
+            padding: 4px 10px;
+            min-width: 40px;
             text-align: center;
         }
+        .player-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
         .player-name {
-            font-weight: 500;
+            font-weight: 600;
             font-size: 14px;
+        }
+        .player-birthday {
+            font-size: 11px;
+            color: var(--gray);
+        }
+        .player-link {
+            font-size: 11px;
+            color: var(--black);
+            text-decoration: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+        .player-link:hover {
+            opacity: 1;
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -715,67 +737,131 @@
                     <div class="players-grid">
                         <div class="player-card">
                             <span class="player-number">1</span>
-                            <span class="player-name">Jaime</span>
+                            <div class="player-info">
+                                <span class="player-name">Jaime</span>
+                                <span class="player-birthday">🎂 8 abr</span>
+                                <a href="https://www.realmadrid.com/es-ES/futbol/cantera-masculina/prebenjamin-b/jaime-crespo-larraz" target="_blank" class="player-link">Foto oficial</a>
+                            </div>
                         </div>
                         <div class="player-card">
                             <span class="player-number">2</span>
-                            <span class="player-name">Dani</span>
+                            <div class="player-info">
+                                <span class="player-name">Dani</span>
+                                <span class="player-birthday">🎂 28 ene</span>
+                                <a href="https://www.realmadrid.com/es-ES/futbol/cantera-masculina/prebenjamin-b/daniel-rodriguez-perez" target="_blank" class="player-link">Foto oficial</a>
+                            </div>
                         </div>
                         <div class="player-card">
                             <span class="player-number">3</span>
-                            <span class="player-name">Elías</span>
+                            <div class="player-info">
+                                <span class="player-name">Elías</span>
+                                <span class="player-birthday">🎂 23 mar</span>
+                                <a href="https://www.realmadrid.com/es-ES/futbol/cantera-masculina/prebenjamin-b/elias-pena-gonzalez" target="_blank" class="player-link">Foto oficial</a>
+                            </div>
                         </div>
                         <div class="player-card">
                             <span class="player-number">4</span>
-                            <span class="player-name">García</span>
+                            <div class="player-info">
+                                <span class="player-name">García</span>
+                                <span class="player-birthday">🎂 25 ago</span>
+                                <a href="https://www.realmadrid.com/es-ES/futbol/cantera-masculina/prebenjamin-b/pablo-garcia-martorell" target="_blank" class="player-link">Foto oficial</a>
+                            </div>
                         </div>
                         <div class="player-card">
                             <span class="player-number">5</span>
-                            <span class="player-name">Mateo</span>
+                            <div class="player-info">
+                                <span class="player-name">Mateo</span>
+                                <span class="player-birthday">🎂 8 mar</span>
+                                <a href="https://www.realmadrid.com/es-ES/futbol/cantera-masculina/prebenjamin-b/mateo-praja" target="_blank" class="player-link">Foto oficial</a>
+                            </div>
                         </div>
                         <div class="player-card">
                             <span class="player-number">6</span>
-                            <span class="player-name">Jorge</span>
+                            <div class="player-info">
+                                <span class="player-name">Jorge</span>
+                                <span class="player-birthday">🎂 23 ene</span>
+                                <a href="https://www.realmadrid.com/es-ES/futbol/cantera-masculina/prebenjamin-b/jorge-perez-santiago" target="_blank" class="player-link">Foto oficial</a>
+                            </div>
                         </div>
                         <div class="player-card">
                             <span class="player-number">7</span>
-                            <span class="player-name">Medina</span>
+                            <div class="player-info">
+                                <span class="player-name">Medina</span>
+                                <span class="player-birthday">🎂 3 mar</span>
+                                <a href="https://www.realmadrid.com/es-ES/futbol/cantera-masculina/prebenjamin-b/marco-medina-gutierrez" target="_blank" class="player-link">Foto oficial</a>
+                            </div>
                         </div>
                         <div class="player-card">
                             <span class="player-number">8</span>
-                            <span class="player-name">Montoya</span>
+                            <div class="player-info">
+                                <span class="player-name">Montoya</span>
+                                <span class="player-birthday">🎂 6 jun</span>
+                                <a href="https://www.realmadrid.com/es-ES/futbol/cantera-masculina/prebenjamin-b/daniel-montoya-bajo" target="_blank" class="player-link">Foto oficial</a>
+                            </div>
                         </div>
                         <div class="player-card">
                             <span class="player-number">9</span>
-                            <span class="player-name">Hugo</span>
+                            <div class="player-info">
+                                <span class="player-name">Hugo</span>
+                                <span class="player-birthday">🎂 11 feb</span>
+                                <a href="https://www.realmadrid.com/es-ES/futbol/cantera-masculina/prebenjamin-b/hugo-terron-nunez" target="_blank" class="player-link">Foto oficial</a>
+                            </div>
                         </div>
                         <div class="player-card">
                             <span class="player-number">10</span>
-                            <span class="player-name">Mauro</span>
+                            <div class="player-info">
+                                <span class="player-name">Mauro</span>
+                                <span class="player-birthday">🎂 1 ene</span>
+                                <a href="https://www.realmadrid.com/es-ES/futbol/cantera-masculina/prebenjamin-b/mauro-urrutia-de-francisco" target="_blank" class="player-link">Foto oficial</a>
+                            </div>
                         </div>
                         <div class="player-card">
                             <span class="player-number">11</span>
-                            <span class="player-name">Alberto</span>
+                            <div class="player-info">
+                                <span class="player-name">Alberto</span>
+                                <span class="player-birthday">🎂 16 may</span>
+                                <a href="https://www.realmadrid.com/es-ES/futbol/cantera-masculina/prebenjamin-b/alberto-gomez-de-benito" target="_blank" class="player-link">Foto oficial</a>
+                            </div>
                         </div>
                         <div class="player-card">
                             <span class="player-number">12</span>
-                            <span class="player-name">Enzo</span>
+                            <div class="player-info">
+                                <span class="player-name">Enzo</span>
+                                <span class="player-birthday">🎂 16 feb</span>
+                                <a href="https://www.realmadrid.com/es-ES/futbol/cantera-masculina/prebenjamin-b/enzo-guijosa-moreno" target="_blank" class="player-link">Foto oficial</a>
+                            </div>
                         </div>
                         <div class="player-card">
                             <span class="player-number">13</span>
-                            <span class="player-name">Bruno</span>
+                            <div class="player-info">
+                                <span class="player-name">Bruno</span>
+                                <span class="player-birthday">🎂 13 jul</span>
+                                <a href="https://www.realmadrid.com/es-ES/futbol/cantera-masculina/prebenjamin-b/bruno-jimenez-gomez" target="_blank" class="player-link">Foto oficial</a>
+                            </div>
                         </div>
                         <div class="player-card">
-                            <span class="player-number">13 BIS</span>
-                            <span class="player-name">Marcos</span>
+                            <span class="player-number">13B</span>
+                            <div class="player-info">
+                                <span class="player-name">Marcos</span>
+                                <span class="player-birthday">🎂 18 may</span>
+                                <a href="https://www.realmadrid.com/es-ES/futbol/cantera-masculina/prebenjamin-b/marcos-blasco-donoso" target="_blank" class="player-link">Foto oficial</a>
+                            </div>
                         </div>
                         <div class="player-card">
                             <span class="player-number">14</span>
-                            <span class="player-name">Martín</span>
+                            <div class="player-info">
+                                <span class="player-name">Martín</span>
+                                <span class="player-birthday">🎂 9 ene</span>
+                                <a href="https://www.realmadrid.com/es-ES/futbol/cantera-masculina/prebenjamin-b/pablo-martin-teresa" target="_blank" class="player-link">Foto oficial</a>
+                            </div>
                         </div>
                         <div class="player-card">
                             <span class="player-number">15</span>
-                            <span class="player-name">Víctor</span>
+                            <div class="player-info">
+                                <span class="player-name">Víctor</span>
+                                <span class="player-birthday">🎂 17 ene</span>
+                                <a href="https://www.realmadrid.com/es-ES/futbol/cantera-masculina/prebenjamin-b/victor-rosado-martin" target="_blank" class="player-link">Foto oficial</a>
+                            </div>
                         </div>
                     </div>
                 </div>
