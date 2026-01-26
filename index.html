@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prebenjamín B | Calendario</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         :root {
             --white: #FFFFFF;
             --cream: #FAFAFA;
-            --gold: #D4AF37;
+            --gold: #FFEA00;
             --black: #0D0D0D;
             --gray: #888;
             --gray-light: #E8E8E8;
@@ -450,6 +449,49 @@
 
         .empty-state { text-align: center; padding: 60px; color: var(--gray); font-size: 14px; }
 
+        /* Weekly Schedule */
+        .weekly-schedule { margin-top: 24px; }
+        .schedule-day {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--gray-light);
+        }
+        .day-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            min-width: 120px;
+        }
+        .day-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--gold);
+        }
+        .day-name { font-weight: 500; }
+        .day-inputs {
+            display: flex;
+            gap: 12px;
+        }
+        .time-input, .field-input {
+            padding: 10px 14px;
+            border: 1px solid var(--gray-light);
+            font-size: 14px;
+            background: var(--white);
+        }
+        .time-input { width: 100px; }
+        .field-input { width: 120px; }
+        .time-input:disabled, .field-input:disabled {
+            background: var(--cream);
+            color: var(--gray);
+        }
+        .time-input:focus, .field-input:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
         @media (max-width: 600px) {
             .content { padding: 20px; }
             .day { min-height: 70px; padding: 6px; }
@@ -498,7 +540,7 @@
         <nav class="tabs">
             <button class="tab active" data-tab="calendar">Calendario</button>
             <button class="tab" data-tab="events">Eventos</button>
-            <button class="tab" data-tab="import">Importar PDF</button>
+            <button class="tab" data-tab="import">Horario</button>
         </nav>
 
         <main class="content">
@@ -538,23 +580,64 @@
             <!-- Import Panel -->
             <div class="panel" id="importPanel">
                 <div class="import-box">
-                    <h2 class="section-title">IMPORTAR HORARIO</h2>
-                    <p class="import-description">Sube el PDF con el horario de la cantera. Se detectarán automáticamente los entrenamientos del Prebenjamín B.</p>
-                    <div class="upload-zone" id="uploadZone">
-                        <input type="file" id="fileInput" accept=".pdf">
-                        <div class="upload-icon">📄</div>
-                        <p class="upload-text"><strong>Arrastra el PDF aquí</strong><br>o haz clic para seleccionar</p>
-                    </div>
-                    <div class="preview" id="preview">
-                        <div class="preview-title">Entrenamientos detectados</div>
-                        <table>
-                            <thead><tr><th>Día</th><th>Hora</th><th>Campo</th></tr></thead>
-                            <tbody id="previewBody"></tbody>
-                        </table>
-                        <div class="import-actions">
-                            <button class="btn btn-secondary" id="cancelImport">CANCELAR</button>
-                            <button class="btn btn-primary" id="confirmImport">IMPORTAR</button>
+                    <h2 class="section-title">HORARIO SEMANAL</h2>
+                    <p class="import-description">Configura los entrenamientos semanales del equipo. Se generarán automáticamente para los próximos 3 meses.</p>
+                    
+                    <div class="weekly-schedule" id="weeklySchedule">
+                        <div class="schedule-day" data-day="1">
+                            <label class="day-checkbox">
+                                <input type="checkbox" class="day-check" data-day="1">
+                                <span class="day-name">Lunes</span>
+                            </label>
+                            <div class="day-inputs">
+                                <input type="time" class="time-input" data-day="1" value="18:45" disabled>
+                                <input type="text" class="field-input" data-day="1" placeholder="Campo (ej: 8-B)" disabled>
+                            </div>
                         </div>
+                        <div class="schedule-day" data-day="2">
+                            <label class="day-checkbox">
+                                <input type="checkbox" class="day-check" data-day="2">
+                                <span class="day-name">Martes</span>
+                            </label>
+                            <div class="day-inputs">
+                                <input type="time" class="time-input" data-day="2" value="18:45" disabled>
+                                <input type="text" class="field-input" data-day="2" placeholder="Campo (ej: 8-B)" disabled>
+                            </div>
+                        </div>
+                        <div class="schedule-day" data-day="3">
+                            <label class="day-checkbox">
+                                <input type="checkbox" class="day-check" data-day="3">
+                                <span class="day-name">Miércoles</span>
+                            </label>
+                            <div class="day-inputs">
+                                <input type="time" class="time-input" data-day="3" value="18:30" disabled>
+                                <input type="text" class="field-input" data-day="3" placeholder="Campo (ej: 5-B)" disabled>
+                            </div>
+                        </div>
+                        <div class="schedule-day" data-day="4">
+                            <label class="day-checkbox">
+                                <input type="checkbox" class="day-check" data-day="4">
+                                <span class="day-name">Jueves</span>
+                            </label>
+                            <div class="day-inputs">
+                                <input type="time" class="time-input" data-day="4" value="18:45" disabled>
+                                <input type="text" class="field-input" data-day="4" placeholder="Campo" disabled>
+                            </div>
+                        </div>
+                        <div class="schedule-day" data-day="5">
+                            <label class="day-checkbox">
+                                <input type="checkbox" class="day-check" data-day="5">
+                                <span class="day-name">Viernes</span>
+                            </label>
+                            <div class="day-inputs">
+                                <input type="time" class="time-input" data-day="5" value="18:45" disabled>
+                                <input type="text" class="field-input" data-day="5" placeholder="Campo" disabled>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="import-actions" style="margin-top: 32px;">
+                        <button class="btn btn-primary" id="generateTrainings">GENERAR ENTRENAMIENTOS</button>
                     </div>
                 </div>
             </div>
@@ -623,9 +706,6 @@
         let importedData = [];
 
         const MONTHS = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
-
-        // PDF.js config
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
         // ===== SUPABASE =====
         async function dbFetch(endpoint, method = 'GET', body = null) {
@@ -860,138 +940,43 @@
             }
         }
 
-        // ===== PDF IMPORT =====
-        async function processPDF(file) {
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                
-                let fullText = '';
-                for (let i = 1; i <= pdf.numPages; i++) {
-                    const page = await pdf.getPage(i);
-                    const textContent = await page.getTextContent();
-                    const pageText = textContent.items.map(item => item.str).join(' ');
-                    fullText += pageText + '\n';
-                }
-
-                console.log('PDF Text:', fullText); // Debug
-
-                // Parse trainings from text
-                const trainings = parseTrainings(fullText);
-                
-                if (trainings.length === 0) {
-                    toast('No se encontró información del Prebenjamín B');
-                    return;
-                }
-
-                importedData = trainings;
-                let html = '';
-                trainings.forEach(t => {
-                    const typeLabel = t.type === 'match' ? ' (Partido)' : '';
-                    html += '<tr><td>' + t.day + typeLabel + '</td><td>' + t.time + '</td><td>' + (t.field || '—') + '</td></tr>';
-                });
-                document.getElementById('previewBody').innerHTML = html;
-                document.getElementById('preview').classList.add('show');
-
-            } catch (err) {
-                console.error(err);
-                toast('Error al procesar el PDF');
-            }
-        }
-
-        function parseTrainings(text) {
-            const trainings = [];
+        // ===== WEEKLY SCHEDULE =====
+        async function generateTrainings() {
+            const checkboxes = document.querySelectorAll('.day-check:checked');
             
-            // Normalize whitespace
-            const normalized = text.replace(/\s+/g, ' ');
-            
-            // Find the Prebenjamin B row data
-            // The PDF structure has: "Prebenjamin B" followed by data for each day column
-            
-            // Look for pattern: Prebenjamin B ... (training data) ... Debutante
-            const prebMatch = normalized.match(/Prebenjamin\s*B\s+(.*?)(?=Debutante|$)/i);
-            
-            if (!prebMatch) {
-                console.log('No Prebenjamin B section found');
-                return trainings;
+            if (checkboxes.length === 0) {
+                toast('Selecciona al menos un día de entrenamiento');
+                return;
             }
             
-            const section = prebMatch[1];
-            console.log('Prebenjamin B section:', section);
-            
-            // Find all "Entrenamiento Campo X-X Hora: HH:MM" patterns
-            const allTrainings = [];
-            const trainingRegex = /Entrenamiento\s+Campo\s+(\d+\s*-?\s*[A-Za-z]?)\s+Hora:\s*(\d{1,2}):(\d{2})/gi;
-            let match;
-            
-            while ((match = trainingRegex.exec(section)) !== null) {
-                const field = match[1].replace(/\s+/g, '').toUpperCase();
-                const time = match[2].padStart(2, '0') + ':' + match[3];
-                allTrainings.push({ field, time });
-            }
-            
-            console.log('Found trainings:', allTrainings);
-            
-            // Based on the PDF structure, Prebenjamin B trains:
-            // Column order: Lunes, Martes, Miércoles, Jueves, Viernes, Sábado, Domingo
-            // From the PDF we can see: Lunes (8-B, 18:45), Martes (8-B, 18:45), Miércoles (5-B, 18:30)
-            
-            const dayNames = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-            const dayNums = [1, 2, 3, 4, 5, 6, 0];
-            
-            // Assign trainings to days in order
-            allTrainings.forEach((t, idx) => {
-                if (idx < dayNames.length) {
-                    trainings.push({
-                        day: dayNames[idx],
-                        dayNum: dayNums[idx],
-                        time: t.time,
-                        field: t.field,
-                        type: 'training'
-                    });
-                }
+            const schedule = [];
+            checkboxes.forEach(cb => {
+                const day = cb.dataset.day;
+                const time = document.querySelector(`.time-input[data-day="${day}"]`).value;
+                const field = document.querySelector(`.field-input[data-day="${day}"]`).value.trim();
+                schedule.push({ dayNum: parseInt(day), time, field });
             });
             
-            // Also check for match (Jornada)
-            const jornadaMatch = section.match(/Jornada\s+\d+\s+(.*?)\s+Campo\s+([\d\w\-]+)\s*\|?\s*Hora:\s*(\d{1,2}):(\d{2})/i);
-            if (jornadaMatch) {
-                const opponent = jornadaMatch[1].trim();
-                const field = jornadaMatch[2].replace(/\s+/g, '').toUpperCase();
-                const time = jornadaMatch[3].padStart(2, '0') + ':' + jornadaMatch[4];
-                
-                // Find which day (usually Sábado or Domingo based on position)
-                trainings.push({
-                    day: 'Sábado',
-                    dayNum: 6,
-                    time: time,
-                    field: field,
-                    type: 'match',
-                    opponent: opponent
-                });
-            }
-            
-            return trainings;
-        }
-
-        async function confirmImport() {
             const today = new Date();
             const end = new Date();
             end.setMonth(end.getMonth() + 3);
 
             let count = 0;
-            for (const t of importedData) {
+            const dayNames = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            
+            for (const s of schedule) {
                 let d = new Date(today);
                 while (d <= end) {
-                    if (d.getDay() === t.dayNum) {
+                    if (d.getDay() === (s.dayNum % 7)) {
                         const dateStr = d.toISOString().split('T')[0];
-                        if (!events.some(e => e.date === dateStr && e.type === 'training' && e.time === t.time)) {
+                        if (!events.some(e => e.date === dateStr && e.type === 'training')) {
                             const newEvent = {
                                 id: Date.now().toString(36) + Math.random().toString(36).substr(2) + count,
                                 title: 'Entrenamiento',
                                 type: 'training',
                                 date: dateStr,
-                                time: t.time,
-                                location: t.field ? 'Campo ' + t.field : '',
+                                time: s.time,
+                                location: s.field ? 'Campo ' + s.field : '',
                                 created_by: currentUser
                             };
                             events.push(newEvent);
@@ -1003,9 +988,6 @@
                 }
             }
 
-            document.getElementById('preview').classList.remove('show');
-            document.getElementById('fileInput').value = '';
-            importedData = [];
             renderCalendar();
             renderEvents();
             toast('Se añadieron ' + count + ' entrenamientos');
@@ -1057,17 +1039,19 @@
             document.getElementById('saveBtn').onclick = handleSave;
             document.getElementById('deleteBtn').onclick = handleDelete;
 
-            // File upload
-            const uploadZone = document.getElementById('uploadZone');
-            const fileInput = document.getElementById('fileInput');
-            uploadZone.onclick = function() { fileInput.click(); };
-            fileInput.onchange = function() { if (this.files[0]) processPDF(this.files[0]); };
-            uploadZone.ondragover = function(e) { e.preventDefault(); this.style.borderColor = '#D4AF37'; };
-            uploadZone.ondragleave = function() { this.style.borderColor = '#E8E8E8'; };
-            uploadZone.ondrop = function(e) { e.preventDefault(); this.style.borderColor = '#E8E8E8'; if (e.dataTransfer.files[0]) processPDF(e.dataTransfer.files[0]); };
+            // Weekly schedule checkboxes
+            document.querySelectorAll('.day-check').forEach(cb => {
+                cb.onchange = function() {
+                    const day = this.dataset.day;
+                    const timeInput = document.querySelector(`.time-input[data-day="${day}"]`);
+                    const fieldInput = document.querySelector(`.field-input[data-day="${day}"]`);
+                    timeInput.disabled = !this.checked;
+                    fieldInput.disabled = !this.checked;
+                };
+            });
 
-            document.getElementById('cancelImport').onclick = function() { document.getElementById('preview').classList.remove('show'); importedData = []; };
-            document.getElementById('confirmImport').onclick = confirmImport;
+            // Generate trainings button
+            document.getElementById('generateTrainings').onclick = generateTrainings;
         });
     </script>
 </body>
