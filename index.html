@@ -2,8 +2,23 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Prebenjamín B | Calendario</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PrebenB">
+    <meta name="theme-color" content="#0D0D0D">
+    <meta name="description" content="Calendario Prebenjamín B - Real Madrid">
+    
+    <!-- PWA Icons - usando data URI -->
+    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCBmaWxsPSIjMEQwRDBEIiB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIi8+PHRleHQgeD0iOTAiIHk9IjExNSIgZm9udC1mYW1pbHk9IkFyaWFsIEJsYWNrLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjgwIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI0ZGRUE5MCI+UEI8L3RleHQ+PC9zdmc+">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCBmaWxsPSIjMEQwRDBEIiB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIi8+PHRleHQgeD0iOTAiIHk9IjExNSIgZm9udC1mYW1pbHk9IkFyaWFsIEJsYWNrLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjgwIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI0ZGRUE5MCI+UEI8L3RleHQ+PC9zdmc+">
+    
+    <!-- Manifest inline -->
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIkNhbGVuZGFyaW8gUHJlYmVuamFtw61uIEIiLAogICJzaG9ydF9uYW1lIjogIlByZWJlbkIiLAogICJkZXNjcmlwdGlvbiI6ICJDYWxlbmRhcmlvIGRlbCBlcXVpcG8gUHJlYmVuamFtw61uIEIgLSBSZWFsIE1hZHJpZCIsCiAgInN0YXJ0X3VybCI6ICIvIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMEQwRDBEIiwKICAidGhlbWVfY29sb3IiOiAiIzBEMEQwRCIsCiAgIm9yaWVudGF0aW9uIjogInBvcnRyYWl0Igp9">
+    
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
@@ -16,7 +31,7 @@
             --gray-light: #E8E8E8;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--cream); min-height: 100vh; }
+        body { font-family: 'Inter', sans-serif; background: var(--cream); min-height: 100vh; -webkit-user-select: none; user-select: none; }
         
         /* LOGIN - MINIMALISTA */
         .login-screen {
@@ -108,8 +123,20 @@
             letter-spacing: 0.15em;
             color: var(--black);
         }
-        .header-user { display: flex; align-items: center; gap: 20px; }
+        .header-user { display: flex; align-items: center; gap: 12px; }
         .user-name { color: var(--gray); font-size: 13px; }
+        .notif-btn {
+            background: transparent;
+            border: 1px solid var(--gray-light);
+            color: var(--gray);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 6px 10px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .notif-btn:hover { border-color: var(--gold); }
+        .notif-btn.active { background: var(--gold); border-color: var(--gold); color: var(--black); }
         .logout-btn {
             background: transparent;
             border: none;
@@ -119,6 +146,40 @@
             text-decoration: underline;
         }
         .logout-btn:hover { color: var(--black); }
+        
+        /* PWA Install Banner */
+        .install-banner {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: var(--black);
+            color: var(--white);
+            padding: 16px 20px;
+            border-radius: 12px;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .install-banner.show { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+        .install-banner p { font-size: 14px; margin: 0; }
+        .install-banner button {
+            background: var(--gold);
+            color: var(--black);
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 14px;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .install-close {
+            background: transparent !important;
+            color: var(--gray) !important;
+            padding: 5px !important;
+            font-size: 18px !important;
+        }
 
         .tabs {
             display: flex;
@@ -682,9 +743,17 @@
             </div>
             <div class="header-user">
                 <span class="user-name" id="userName"></span>
+                <button class="notif-btn" id="notifBtn" title="Notificaciones">🔔</button>
                 <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
             </div>
         </header>
+        
+        <!-- Install Banner para PWA -->
+        <div class="install-banner" id="installBanner">
+            <p>📱 Instala la app para recibir notificaciones</p>
+            <button id="installBtn">INSTALAR</button>
+            <button class="install-close" id="installClose">✕</button>
+        </div>
 
         <nav class="tabs">
             <button class="tab active" data-tab="calendar">Calendario</button>
@@ -1464,6 +1533,293 @@
             };
             
             document.getElementById('confirmImport').onclick = confirmImport;
+
+            // Inicializar cumpleaños
+            initBirthdays();
+            
+            // Registrar Service Worker y solicitar notificaciones
+            initPWA();
+        });
+
+        // ===== CUMPLEAÑOS =====
+        const BIRTHDAYS = [
+            { name: 'Jaime', day: 8, month: 4 },
+            { name: 'Dani', day: 28, month: 1 },
+            { name: 'Elías', day: 23, month: 3 },
+            { name: 'García', day: 25, month: 8 },
+            { name: 'Mateo', day: 8, month: 3 },
+            { name: 'Jorge', day: 23, month: 1 },
+            { name: 'Medina', day: 3, month: 3 },
+            { name: 'Montoya', day: 6, month: 6 },
+            { name: 'Hugo', day: 11, month: 2 },
+            { name: 'Mauro', day: 1, month: 1 },
+            { name: 'Alberto', day: 16, month: 5 },
+            { name: 'Enzo', day: 16, month: 2 },
+            { name: 'Bruno', day: 13, month: 7 },
+            { name: 'Marcos', day: 18, month: 5 },
+            { name: 'Martín', day: 9, month: 1 },
+            { name: 'Víctor', day: 17, month: 1 }
+        ];
+
+        async function initBirthdays() {
+            const birthdaysAdded = localStorage.getItem('birthdaysAdded2026');
+            if (birthdaysAdded) return;
+            
+            const year = 2026;
+            let count = 0;
+            
+            for (const b of BIRTHDAYS) {
+                const dateStr = `${year}-${String(b.month).padStart(2,'0')}-${String(b.day).padStart(2,'0')}`;
+                const title = `🎂 Cumple ${b.name}`;
+                
+                // Verificar si ya existe
+                const exists = events.some(e => e.date === dateStr && e.title === title);
+                if (!exists) {
+                    const newEvent = {
+                        id: 'bday_' + b.name.toLowerCase() + '_' + year,
+                        title: title,
+                        type: 'meeting',
+                        date: dateStr,
+                        time: null,
+                        location: null,
+                        notes: `Cumpleaños de ${b.name}`,
+                        created_by: 'system'
+                    };
+                    events.push(newEvent);
+                    await saveEvent(newEvent);
+                    count++;
+                }
+            }
+            
+            localStorage.setItem('birthdaysAdded2026', 'true');
+            if (count > 0) {
+                renderCalendar();
+                renderEvents();
+                toast(`Se añadieron ${count} cumpleaños al calendario`);
+            }
+        }
+
+        // ===== PWA & NOTIFICACIONES =====
+        let notificationsEnabled = false;
+
+        async function initPWA() {
+            // Service Worker inline como Blob
+            const swCode = `
+const CACHE_NAME = 'prebenjamin-v1';
+
+self.addEventListener('install', (e) => { self.skipWaiting(); });
+self.addEventListener('activate', (e) => { self.clients.claim(); });
+
+self.addEventListener('message', (event) => {
+    if (event.data.type === 'SHOW_NOTIFICATION') {
+        self.registration.showNotification(event.data.title, {
+            body: event.data.body,
+            icon: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxODAgMTgwIj48cmVjdCBmaWxsPSIjMEQwRDBEIiB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgcng9IjQwIi8+PHRleHQgeD0iOTAiIHk9IjExNSIgZm9udC1mYW1pbHk9IkFyaWFsIEJsYWNrIiBmb250LXNpemU9IjgwIiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI0ZGRUE5MCI+UEI8L3RleHQ+PC9zdmc+',
+            badge: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA5NiA5NiI+PHJlY3QgZmlsbD0iI0ZGRUE5MCIgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiByeD0iMjAiLz48dGV4dCB4PSI0OCIgeT0iNjUiIGZvbnQtZmFtaWx5PSJBcmlhbCBCbGFjayIgZm9udC1zaXplPSI0NSIgZm9udC13ZWlnaHQ9ImJvbGQiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiMwRDBEMEQiPlBCPC90ZXh0Pjwvc3ZnPg==',
+            vibrate: [200, 100, 200],
+            tag: 'evento-dia',
+            renotify: true
+        });
+    }
+});
+
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    event.waitUntil(clients.openWindow('/'));
+});
+            `;
+            
+            if ('serviceWorker' in navigator) {
+                try {
+                    // Crear blob URL para el service worker
+                    const blob = new Blob([swCode], { type: 'application/javascript' });
+                    const swUrl = URL.createObjectURL(blob);
+                    
+                    // Intentar registrar (puede fallar en algunos navegadores por blob URL)
+                    try {
+                        await navigator.serviceWorker.register(swUrl, { scope: '/' });
+                        console.log('Service Worker registrado (blob)');
+                    } catch (e) {
+                        // Fallback: intentar registrar sw.js externo
+                        try {
+                            await navigator.serviceWorker.register('sw.js');
+                            console.log('Service Worker registrado (externo)');
+                        } catch (e2) {
+                            console.log('SW no disponible:', e2);
+                        }
+                    }
+                    
+                    // Solicitar permiso de notificaciones
+                    if ('Notification' in window) {
+                        const permission = await Notification.requestPermission();
+                        notificationsEnabled = permission === 'granted';
+                        if (notificationsEnabled) {
+                            console.log('Notificaciones habilitadas');
+                            // Esperar a que carguen los eventos
+                            setTimeout(() => {
+                                checkTodayEvents();
+                                scheduleDailyCheck();
+                            }, 2000);
+                        }
+                    }
+                } catch (err) {
+                    console.log('Error PWA:', err);
+                }
+            }
+        }
+
+        function checkTodayEvents() {
+            if (!notificationsEnabled) return;
+            
+            const today = new Date().toISOString().split('T')[0];
+            const todayEvents = events.filter(e => e.date === today);
+            
+            if (todayEvents.length > 0) {
+                const titles = todayEvents.map(e => e.title).join(', ');
+                showNotification('📅 Hoy tienes eventos', titles);
+            }
+        }
+
+        function showNotification(title, body) {
+            if (!notificationsEnabled) return;
+            
+            if (navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'SHOW_NOTIFICATION',
+                    title: title,
+                    body: body
+                });
+            } else {
+                new Notification(title, { body: body, icon: 'icon-192.png' });
+            }
+        }
+
+        function scheduleDailyCheck() {
+            // Calcular ms hasta las 8:00 del día siguiente
+            const now = new Date();
+            const tomorrow8am = new Date(now);
+            tomorrow8am.setDate(tomorrow8am.getDate() + 1);
+            tomorrow8am.setHours(8, 0, 0, 0);
+            
+            const msUntil8am = tomorrow8am - now;
+            
+            setTimeout(() => {
+                checkTodayEvents();
+                // Repetir cada 24h
+                setInterval(checkTodayEvents, 24 * 60 * 60 * 1000);
+            }, msUntil8am);
+        }
+
+        // ===== UI NOTIFICACIONES =====
+        function updateNotifButton() {
+            const btn = document.getElementById('notifBtn');
+            if (!btn) return;
+            
+            if (notificationsEnabled) {
+                btn.classList.add('active');
+                btn.title = 'Notificaciones activadas';
+            } else {
+                btn.classList.remove('active');
+                btn.title = 'Activar notificaciones';
+            }
+        }
+
+        async function toggleNotifications() {
+            if (!('Notification' in window)) {
+                toast('Tu navegador no soporta notificaciones');
+                return;
+            }
+            
+            if (Notification.permission === 'denied') {
+                toast('Las notificaciones están bloqueadas. Actívalas en la configuración del navegador.');
+                return;
+            }
+            
+            if (notificationsEnabled) {
+                // Ya están activadas, mostrar info
+                toast('Las notificaciones ya están activadas ✓');
+                checkTodayEvents();
+            } else {
+                // Solicitar permiso
+                const permission = await Notification.requestPermission();
+                notificationsEnabled = permission === 'granted';
+                updateNotifButton();
+                
+                if (notificationsEnabled) {
+                    toast('¡Notificaciones activadas! Te avisaremos de los eventos del día.');
+                    checkTodayEvents();
+                } else {
+                    toast('Notificaciones no permitidas');
+                }
+            }
+        }
+
+        // ===== PWA INSTALL =====
+        let deferredPrompt = null;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            // Mostrar banner solo en móvil
+            if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                setTimeout(() => {
+                    document.getElementById('installBanner').classList.add('show');
+                }, 3000);
+            }
+        });
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choice) => {
+                    if (choice.outcome === 'accepted') {
+                        toast('¡App instalada! Ya puedes usarla desde tu pantalla de inicio.');
+                    }
+                    deferredPrompt = null;
+                    document.getElementById('installBanner').classList.remove('show');
+                });
+            } else {
+                // iOS instructions
+                if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                    toast('Para instalar: pulsa el botón compartir (📤) y luego "Añadir a pantalla de inicio"');
+                }
+            }
+        }
+
+        // Init notif button and install banner
+        document.addEventListener('DOMContentLoaded', function() {
+            // Notif button
+            const notifBtn = document.getElementById('notifBtn');
+            if (notifBtn) {
+                notifBtn.onclick = toggleNotifications;
+                // Check current permission
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    notificationsEnabled = true;
+                    updateNotifButton();
+                }
+            }
+            
+            // Install buttons
+            const installBtn = document.getElementById('installBtn');
+            const installClose = document.getElementById('installClose');
+            if (installBtn) installBtn.onclick = installPWA;
+            if (installClose) {
+                installClose.onclick = () => {
+                    document.getElementById('installBanner').classList.remove('show');
+                };
+            }
+            
+            // Mostrar instrucciones iOS automáticamente
+            if (/iPhone|iPad|iPod/i.test(navigator.userAgent) && !window.navigator.standalone) {
+                setTimeout(() => {
+                    const banner = document.getElementById('installBanner');
+                    if (banner) {
+                        banner.querySelector('p').textContent = '📱 Para instalar: pulsa 📤 y "Añadir a pantalla de inicio"';
+                        banner.querySelector('#installBtn').style.display = 'none';
+                        banner.classList.add('show');
+                    }
+                }, 5000);
+            }
         });
     </script>
 </body>
