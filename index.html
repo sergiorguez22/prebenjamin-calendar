@@ -1453,17 +1453,13 @@
             settings: 'prebenjamin_settings'
         };
 
-        // ========== SUPABASE CONFIG ==========
-        const SUPABASE_URL = 'https://bxawlznatchqdvpdrjuh.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4YXdsem5hdGNocWR2cGRyanVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MjQ2NTgsImV4cCI6MjA4NTAwMDY1OH0.rS4_yPqMo48xwWptIDrcVxpQq_DVsImoxxPTDPTqDRU';
-
         // Supabase API helper
         async function supabaseRequest(endpoint, method = 'GET', body = null) {
             const options = {
                 method,
                 headers: {
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
                     'Content-Type': 'application/json',
                     'Prefer': method === 'POST' ? 'return=representation' : undefined
                 }
