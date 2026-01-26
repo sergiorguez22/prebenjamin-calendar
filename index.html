@@ -193,6 +193,25 @@
             transition: all 0.2s;
         }
         .today-btn:hover { background: var(--black); color: var(--white); }
+        
+        .calendar-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .add-event-btn {
+            padding: 10px 20px;
+            background: var(--gold);
+            color: var(--black);
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .add-event-btn:hover { background: #e6c200; }
 
         .calendar {
             background: var(--white);
@@ -458,6 +477,47 @@
 
         .empty-state { text-align: center; padding: 60px; color: var(--gray); font-size: 14px; }
 
+        /* Plantilla */
+        .plantilla-container {
+            background: var(--white);
+            border: 1px solid var(--gray-light);
+            padding: 32px;
+        }
+        .players-list {
+            margin-top: 24px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+        .player-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            background: var(--cream);
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .player-card:hover {
+            background: var(--gold);
+        }
+        .player-number {
+            width: 36px;
+            height: 36px;
+            background: var(--black);
+            color: var(--white);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.2rem;
+        }
+        .player-name {
+            font-weight: 500;
+            font-size: 15px;
+        }
+
         /* Weekly Schedule */
         .weekly-schedule { margin-top: 24px; }
         .schedule-day {
@@ -507,6 +567,64 @@
             .day-num { width: 24px; height: 24px; font-size: 12px; }
             .event-dot { font-size: 9px; padding: 2px 4px; }
             .form-row { grid-template-columns: 1fr; }
+            .calendar-actions { flex-direction: column; gap: 8px; }
+            .players-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        /* Calendar Actions */
+        .calendar-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        .add-event-btn {
+            padding: 10px 20px;
+            background: var(--gold);
+            color: var(--black);
+            border: none;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .add-event-btn:hover { opacity: 0.85; }
+
+        /* Plantilla */
+        .plantilla-container {
+            background: var(--white);
+            border: 1px solid var(--gray-light);
+            padding: 32px;
+        }
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .player-card {
+            background: var(--cream);
+            border: 1px solid var(--gray-light);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+        .player-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-2px);
+        }
+        .player-number {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            color: var(--gold);
+            min-width: 45px;
+            text-align: center;
+        }
+        .player-name {
+            font-weight: 500;
+            font-size: 14px;
         }
     </style>
 </head>
@@ -549,6 +667,7 @@
         <nav class="tabs">
             <button class="tab active" data-tab="calendar">Calendario</button>
             <button class="tab" data-tab="events">Eventos</button>
+            <button class="tab" data-tab="plantilla">Plantilla</button>
             <button class="tab" data-tab="import">Importar PDF</button>
         </nav>
 
@@ -561,7 +680,10 @@
                         <h2 class="month-title" id="monthTitle"></h2>
                         <button class="nav-btn" id="nextMonth">›</button>
                     </div>
-                    <button class="today-btn" id="todayBtn">HOY</button>
+                    <div class="calendar-actions">
+                        <button class="add-event-btn" id="addEventBtnCal">+ AÑADIR EVENTO</button>
+                        <button class="today-btn" id="todayBtn">HOY</button>
+                    </div>
                 </div>
                 <div class="calendar">
                     <div class="weekdays">
@@ -584,6 +706,79 @@
                     <button class="add-btn" id="addEventBtn">+ NUEVO</button>
                 </div>
                 <div id="eventsList"></div>
+            </div>
+
+            <!-- Plantilla Panel -->
+            <div class="panel" id="plantillaPanel">
+                <div class="plantilla-container">
+                    <h2 class="section-title">PLANTILLA PREBENJAMÍN B</h2>
+                    <div class="players-grid">
+                        <div class="player-card">
+                            <span class="player-number">1</span>
+                            <span class="player-name">Jaime</span>
+                        </div>
+                        <div class="player-card">
+                            <span class="player-number">2</span>
+                            <span class="player-name">Dani</span>
+                        </div>
+                        <div class="player-card">
+                            <span class="player-number">3</span>
+                            <span class="player-name">Elías</span>
+                        </div>
+                        <div class="player-card">
+                            <span class="player-number">4</span>
+                            <span class="player-name">García</span>
+                        </div>
+                        <div class="player-card">
+                            <span class="player-number">5</span>
+                            <span class="player-name">Mateo</span>
+                        </div>
+                        <div class="player-card">
+                            <span class="player-number">6</span>
+                            <span class="player-name">Jorge</span>
+                        </div>
+                        <div class="player-card">
+                            <span class="player-number">7</span>
+                            <span class="player-name">Medina</span>
+                        </div>
+                        <div class="player-card">
+                            <span class="player-number">8</span>
+                            <span class="player-name">Montoya</span>
+                        </div>
+                        <div class="player-card">
+                            <span class="player-number">9</span>
+                            <span class="player-name">Hugo</span>
+                        </div>
+                        <div class="player-card">
+                            <span class="player-number">10</span>
+                            <span class="player-name">Mauro</span>
+                        </div>
+                        <div class="player-card">
+                            <span class="player-number">11</span>
+                            <span class="player-name">Alberto</span>
+                        </div>
+                        <div class="player-card">
+                            <span class="player-number">12</span>
+                            <span class="player-name">Enzo</span>
+                        </div>
+                        <div class="player-card">
+                            <span class="player-number">13</span>
+                            <span class="player-name">Bruno</span>
+                        </div>
+                        <div class="player-card">
+                            <span class="player-number">13 BIS</span>
+                            <span class="player-name">Marcos</span>
+                        </div>
+                        <div class="player-card">
+                            <span class="player-number">14</span>
+                            <span class="player-name">Martín</span>
+                        </div>
+                        <div class="player-card">
+                            <span class="player-number">15</span>
+                            <span class="player-name">Víctor</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Import Panel -->
@@ -1146,6 +1341,7 @@
 
             // Modal
             document.getElementById('addEventBtn').onclick = function() { openModal(); };
+            document.getElementById('addEventBtnCal').onclick = function() { openModal(); };
             document.getElementById('modalClose').onclick = closeModal;
             document.getElementById('modal').onclick = function(e) { if (e.target === this) closeModal(); };
             document.getElementById('saveBtn').onclick = handleSave;
