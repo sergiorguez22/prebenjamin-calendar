@@ -988,73 +988,50 @@
             const rowText = rowItems.map(i => i.text).join(' ');
             console.log('Texto de la fila Prebenjamin B:', rowText);
             
-            // Buscar patrones de entrenamiento: "Entrenamiento Campo X-Y Hora: HH:MM"
-            const entrenamientoRegex = /Entrenamiento\s+Campo\s+(\d+)\s*-?\s*([A-Za-z]?)\s+Hora:\s*(\d{1,2}):(\d{2})/gi;
+            let eventIndex = 0;
+            
+            // 1. Buscar entrenamientos: "Entrenamiento Campo X - Y Hora: HH:MM"
+            const entrenamientoRegex = /Entrenamiento\s+Campo\s+(\d+)\s*-\s*([A-Za-z])\s+Hora:\s*(\d{1,2}):(\d{2})/gi;
             let match;
-            let dayIndex = 0;
             
             while ((match = entrenamientoRegex.exec(rowText)) !== null) {
-                const field = match[1] + (match[2] ? '-' + match[2].toUpperCase() : '');
+                const field = match[1] + '-' + match[2].toUpperCase();
                 const time = match[3].padStart(2, '0') + ':' + match[4];
                 
                 trainings.push({
-                    day: days[dayIndex] || 'Día ' + (dayIndex + 1),
-                    dayNum: dayNums[dayIndex] || (dayIndex % 7),
+                    day: days[eventIndex],
+                    dayNum: dayNums[eventIndex],
                     time: time,
                     field: field,
                     isMatch: false
                 });
-                dayIndex++;
+                eventIndex++;
             }
             
-            // Buscar partidos: "Jornada X RIVAL Campo Y Hora: HH:MM" o variantes
-            // Ejemplo: "Jornada 10 C.D. San Roque E.F.F. Prebenjamin A Campo 9 - B | Hora: 18:30"
-            const jornadaRegex = /Jornada\s+(\d+)\s+([A-Za-z\.\s]+?)(?:Campo|Hora)\s*(\d+)?\s*-?\s*([A-Za-z]?)?\s*[\|]?\s*Hora:\s*(\d{1,2}):(\d{2})/gi;
-            let jMatch;
+            // 2. Buscar partidos - formato del PDF: "RIVAL Campo X - Y | Hora: HH:MM Jornada N"
+            // Ejemplo: "C.D. San Roque E.F.F. Prebenjamin A Campo 9 - B | Hora: 18:30 Jornada 10"
+            const partidoRegex = /([A-Z][A-Za-z\.\s]+?)\s+Campo\s+(\d+)\s*-\s*([A-Za-z])\s*\|\s*Hora:\s*(\d{1,2}):(\d{2})\s+Jornada\s+(\d+)/gi;
+            let pMatch;
             
-            while ((jMatch = jornadaRegex.exec(rowText)) !== null) {
-                const jornada = jMatch[1];
-                let opponent = jMatch[2].trim();
-                const field = jMatch[3] ? jMatch[3] + (jMatch[4] ? '-' + jMatch[4].toUpperCase() : '') : '';
-                const time = jMatch[5].padStart(2, '0') + ':' + jMatch[6];
-                
-                // Limpiar nombre del rival
-                opponent = opponent.replace(/Prebenjamin.*$/i, '').trim();
+            while ((pMatch = partidoRegex.exec(rowText)) !== null) {
+                let opponent = pMatch[1].trim();
+                const field = pMatch[2] + '-' + pMatch[3].toUpperCase();
+                const time = pMatch[4].padStart(2, '0') + ':' + pMatch[5];
+                const jornada = pMatch[6];
                 
                 trainings.push({
-                    day: 'Sábado',
-                    dayNum: 6,
+                    day: days[eventIndex],
+                    dayNum: dayNums[eventIndex],
                     time: time,
                     field: field,
                     isMatch: true,
                     opponent: opponent,
                     jornada: jornada
                 });
+                eventIndex++;
             }
             
-            // Buscar también formato alternativo: "Jornada 10 RIVAL | Hora: HH:MM"
-            const jornadaAltRegex = /Jornada\s+(\d+)\s+([^|]+?)\s+Campo\s+(\d+)\s*-?\s*([A-Za-z]?)\s*\|\s*Hora:\s*(\d{1,2}):(\d{2})/gi;
-            let jAltMatch;
-            
-            while ((jAltMatch = jornadaAltRegex.exec(rowText)) !== null) {
-                // Evitar duplicados
-                const time = jAltMatch[5].padStart(2, '0') + ':' + jAltMatch[6];
-                if (trainings.some(t => t.isMatch && t.time === time)) continue;
-                
-                const field = jAltMatch[3] + (jAltMatch[4] ? '-' + jAltMatch[4].toUpperCase() : '');
-                let opponent = jAltMatch[2].trim().replace(/Prebenjamin.*$/i, '').trim();
-                
-                trainings.push({
-                    day: 'Sábado',
-                    dayNum: 6,
-                    time: time,
-                    field: field,
-                    isMatch: true,
-                    opponent: opponent,
-                    jornada: jAltMatch[1]
-                });
-            }
-            
+            console.log('Eventos extraídos:', trainings);
             return trainings;
         }
 
