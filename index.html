@@ -2,1247 +2,407 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#1a1a1a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Prebenjamín B | Calendario Técnico</title>
-    <link rel="manifest" href="manifest.json">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prebenjamín B | Calendario</title>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --white: #FFFFFF;
             --cream: #F5F5F0;
             --gold: #D4A853;
-            --gold-light: #E8C97A;
             --black: #1A1A1A;
-            --gray-dark: #2D2D2D;
-            --gray-medium: #6B6B6B;
+            --gray: #6B6B6B;
             --gray-light: #E5E5E5;
-            --accent-blue: #00529F;
-            --success: #2E7D32;
-            --warning: #F57C00;
-            --error: #C62828;
-            
-            --font-display: 'Bebas Neue', sans-serif;
-            --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            
-            --spacing-xs: 4px;
-            --spacing-sm: 8px;
-            --spacing-md: 16px;
-            --spacing-lg: 24px;
-            --spacing-xl: 32px;
-            --spacing-2xl: 48px;
-            
-            --radius-sm: 4px;
-            --radius-md: 8px;
-            --radius-lg: 16px;
-            
-            --shadow-subtle: 0 1px 3px rgba(0,0,0,0.08);
-            --shadow-medium: 0 4px 12px rgba(0,0,0,0.12);
-            --shadow-strong: 0 8px 24px rgba(0,0,0,0.16);
-            
-            --transition-fast: 150ms ease;
-            --transition-medium: 250ms ease;
         }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: var(--font-body);
-            background: var(--cream);
-            color: var(--black);
-            min-height: 100vh;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* ========== LOGIN SCREEN ========== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--cream); min-height: 100vh; }
+        
+        /* LOGIN */
         .login-screen {
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: var(--spacing-lg);
-            background: linear-gradient(180deg, var(--black) 0%, var(--gray-dark) 100%);
-            position: relative;
-            overflow: hidden;
+            background: var(--black);
+            padding: 20px;
         }
-
-        .login-screen::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 100px,
-                rgba(212, 168, 83, 0.03) 100px,
-                rgba(212, 168, 83, 0.03) 200px
-            );
-            animation: patternMove 60s linear infinite;
-        }
-
-        @keyframes patternMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(200px, 200px); }
-        }
-
-        .login-container {
-            position: relative;
-            z-index: 1;
+        .login-box {
+            background: var(--white);
+            padding: 40px;
+            border-radius: 16px;
             width: 100%;
             max-width: 380px;
         }
-
-        .login-header {
-            text-align: center;
-            margin-bottom: var(--spacing-2xl);
-        }
-
-        .login-badge {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto var(--spacing-lg);
-            background: var(--white);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow-strong);
-            position: relative;
-        }
-
-        .login-badge::after {
-            content: '';
-            position: absolute;
-            inset: -3px;
-            border-radius: 50%;
-            border: 2px solid var(--gold);
-            opacity: 0.6;
-        }
-
-        .login-badge svg {
-            width: 48px;
-            height: 48px;
-        }
-
         .login-title {
-            font-family: var(--font-display);
-            font-size: 2.5rem;
-            color: var(--white);
-            letter-spacing: 0.05em;
-            margin-bottom: var(--spacing-xs);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--black);
         }
-
-        .login-subtitle {
-            font-size: 0.875rem;
-            color: var(--gold);
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            font-weight: 500;
-        }
-
-        .login-form {
-            background: var(--white);
-            padding: var(--spacing-xl);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-strong);
-        }
-
-        .form-group {
-            margin-bottom: var(--spacing-lg);
-        }
-
+        .login-title span { color: var(--gold); }
+        .form-group { margin-bottom: 20px; }
         .form-label {
             display: block;
-            font-size: 0.75rem;
+            font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--gray-medium);
-            margin-bottom: var(--spacing-sm);
+            color: var(--gray);
+            margin-bottom: 8px;
         }
-
         .form-input {
             width: 100%;
-            padding: var(--spacing-md);
+            padding: 14px;
             border: 2px solid var(--gray-light);
-            border-radius: var(--radius-md);
-            font-family: var(--font-body);
-            font-size: 1rem;
-            transition: var(--transition-fast);
-            background: var(--white);
+            border-radius: 8px;
+            font-size: 16px;
         }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--gold);
-            box-shadow: 0 0 0 3px rgba(212, 168, 83, 0.15);
-        }
-
+        .form-input:focus { outline: none; border-color: var(--gold); }
         .login-btn {
             width: 100%;
-            padding: var(--spacing-md) var(--spacing-lg);
+            padding: 14px;
             background: var(--black);
             color: var(--white);
             border: none;
-            border-radius: var(--radius-md);
-            font-family: var(--font-display);
-            font-size: 1.25rem;
-            letter-spacing: 0.1em;
+            border-radius: 8px;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.2rem;
             cursor: pointer;
-            transition: var(--transition-medium);
-            position: relative;
-            overflow: hidden;
         }
-
-        .login-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(212, 168, 83, 0.3), transparent);
-            transition: var(--transition-medium);
-        }
-
-        .login-btn:hover::before {
-            left: 100%;
-        }
-
-        .login-btn:hover {
-            background: var(--gray-dark);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-medium);
-        }
-
+        .login-btn:hover { background: #333; }
         .login-error {
-            background: rgba(198, 40, 40, 0.1);
-            border: 1px solid var(--error);
-            color: var(--error);
-            padding: var(--spacing-md);
-            border-radius: var(--radius-md);
-            font-size: 0.875rem;
-            margin-bottom: var(--spacing-lg);
+            background: #fee;
+            border: 1px solid #c00;
+            color: #c00;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
             display: none;
+            font-size: 14px;
         }
+        .login-error.show { display: block; }
 
-        .login-error.show {
-            display: block;
-        }
-
-        /* ========== MAIN APP ========== */
-        .app {
-            display: none;
-            min-height: 100vh;
-            flex-direction: column;
-        }
-
-        .app.active {
-            display: flex;
-        }
-
-        /* Header */
-        .app-header {
+        /* APP */
+        .app { display: none; min-height: 100vh; }
+        .app.active { display: block; }
+        
+        .header {
             background: var(--black);
             color: var(--white);
-            padding: var(--spacing-md) var(--spacing-lg);
+            padding: 16px 24px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow-medium);
-        }
-
-        .header-left {
-            display: flex;
             align-items: center;
-            gap: var(--spacing-md);
         }
-
-        .header-badge {
-            width: 40px;
-            height: 40px;
-            background: var(--white);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .header-badge svg {
-            width: 24px;
-            height: 24px;
-        }
-
         .header-title {
-            font-family: var(--font-display);
+            font-family: 'Bebas Neue', sans-serif;
             font-size: 1.5rem;
-            letter-spacing: 0.05em;
         }
-
-        .header-user {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-md);
-        }
-
-        .user-name {
-            font-size: 0.875rem;
-            color: var(--gold);
-            font-weight: 500;
-        }
-
+        .header-user { display: flex; align-items: center; gap: 16px; }
+        .user-name { color: var(--gold); font-size: 14px; }
         .logout-btn {
             background: transparent;
-            border: 1px solid var(--gray-medium);
+            border: 1px solid var(--gray);
             color: var(--white);
-            padding: var(--spacing-sm) var(--spacing-md);
-            border-radius: var(--radius-sm);
-            font-size: 0.75rem;
+            padding: 8px 16px;
+            border-radius: 4px;
             cursor: pointer;
-            transition: var(--transition-fast);
+            font-size: 12px;
         }
 
-        .logout-btn:hover {
-            border-color: var(--gold);
-            color: var(--gold);
-        }
-
-        /* Navigation Tabs */
-        .nav-tabs {
+        .tabs {
             display: flex;
             background: var(--white);
             border-bottom: 1px solid var(--gray-light);
-            padding: 0 var(--spacing-lg);
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+            padding: 0 24px;
         }
-
-        .nav-tab {
-            padding: var(--spacing-md) var(--spacing-lg);
+        .tab {
+            padding: 16px 24px;
             background: none;
             border: none;
-            font-family: var(--font-body);
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--gray-medium);
+            font-size: 14px;
+            color: var(--gray);
             cursor: pointer;
-            position: relative;
-            white-space: nowrap;
-            transition: var(--transition-fast);
+            border-bottom: 3px solid transparent;
         }
+        .tab.active { color: var(--black); border-bottom-color: var(--gold); }
 
-        .nav-tab::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            width: 0;
-            height: 3px;
-            background: var(--gold);
-            transition: var(--transition-medium);
-            transform: translateX(-50%);
-        }
+        .content { padding: 24px; max-width: 1000px; margin: 0 auto; }
+        .panel { display: none; }
+        .panel.active { display: block; }
 
-        .nav-tab.active {
-            color: var(--black);
-        }
-
-        .nav-tab.active::after {
-            width: 100%;
-        }
-
-        .nav-tab:hover {
-            color: var(--black);
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            padding: var(--spacing-lg);
-            max-width: 1200px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* Tab Panels */
-        .tab-panel {
-            display: none;
-        }
-
-        .tab-panel.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ========== CALENDAR VIEW ========== */
+        /* CALENDAR */
         .calendar-header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .month-navigation {
-            display: flex;
             align-items: center;
-            gap: var(--spacing-md);
+            margin-bottom: 24px;
         }
-
-        .month-title {
-            font-family: var(--font-display);
-            font-size: 2rem;
-            letter-spacing: 0.02em;
-            min-width: 200px;
-            text-align: center;
-        }
-
+        .month-nav { display: flex; align-items: center; gap: 16px; }
+        .month-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; min-width: 180px; text-align: center; }
         .nav-btn {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: var(--white);
             border: 2px solid var(--gray-light);
+            background: var(--white);
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition-fast);
+            font-size: 18px;
         }
-
-        .nav-btn:hover {
-            border-color: var(--gold);
-            background: var(--gold);
-        }
-
-        .nav-btn svg {
-            width: 20px;
-            height: 20px;
-        }
-
+        .nav-btn:hover { border-color: var(--gold); }
         .today-btn {
-            padding: var(--spacing-sm) var(--spacing-md);
+            padding: 10px 20px;
             background: var(--black);
             color: var(--white);
             border: none;
-            border-radius: var(--radius-sm);
-            font-size: 0.875rem;
-            font-weight: 500;
+            border-radius: 4px;
             cursor: pointer;
-            transition: var(--transition-fast);
         }
 
-        .today-btn:hover {
-            background: var(--gray-dark);
-        }
-
-        .calendar-grid {
+        .calendar {
             background: var(--white);
-            border-radius: var(--radius-lg);
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: var(--shadow-subtle);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-
-        .calendar-weekdays {
+        .weekdays {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
             background: var(--black);
             color: var(--white);
         }
-
         .weekday {
-            padding: var(--spacing-md);
+            padding: 12px;
             text-align: center;
-            font-size: 0.75rem;
+            font-size: 12px;
             font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
         }
-
-        .calendar-days {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-        }
-
-        .calendar-day {
-            min-height: 100px;
-            padding: var(--spacing-sm);
+        .days { display: grid; grid-template-columns: repeat(7, 1fr); }
+        .day {
+            min-height: 90px;
+            padding: 8px;
             border: 1px solid var(--gray-light);
-            border-top: none;
-            border-left: none;
             cursor: pointer;
-            transition: var(--transition-fast);
-            position: relative;
         }
-
-        .calendar-day:nth-child(7n) {
-            border-right: none;
-        }
-
-        .calendar-day:hover {
-            background: rgba(212, 168, 83, 0.05);
-        }
-
-        .calendar-day.other-month {
-            background: var(--cream);
-            color: var(--gray-medium);
-        }
-
-        .calendar-day.today {
-            background: rgba(212, 168, 83, 0.1);
-        }
-
-        .calendar-day.today .day-number {
-            background: var(--gold);
-            color: var(--white);
-        }
-
-        .day-number {
+        .day:hover { background: rgba(212,168,83,0.1); }
+        .day.other { background: #f5f5f5; color: #999; }
+        .day.today { background: rgba(212,168,83,0.2); }
+        .day-num {
             width: 28px;
             height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            font-size: 0.875rem;
+            font-size: 14px;
             border-radius: 50%;
-            margin-bottom: var(--spacing-xs);
         }
-
-        .day-events {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-        }
-
-        .event-pill {
-            padding: 2px var(--spacing-xs);
-            border-radius: var(--radius-sm);
-            font-size: 0.7rem;
-            font-weight: 500;
+        .day.today .day-num { background: var(--gold); color: var(--white); }
+        .event-dot {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-top: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            cursor: pointer;
-            transition: var(--transition-fast);
         }
+        .event-dot.training { background: var(--gold); color: var(--black); }
+        .event-dot.match { background: #00529F; color: var(--white); }
+        .event-dot.meeting { background: var(--black); color: var(--white); }
 
-        .event-pill:hover {
-            transform: scale(1.02);
-        }
-
-        .event-pill.training {
-            background: var(--gold);
-            color: var(--black);
-        }
-
-        .event-pill.match {
-            background: var(--accent-blue);
-            color: var(--white);
-        }
-
-        .event-pill.meeting {
-            background: var(--gray-dark);
-            color: var(--white);
-        }
-
-        .event-pill.other {
-            background: var(--gray-light);
-            color: var(--black);
-        }
-
-        /* ========== IMPORT PANEL ========== */
-        .import-section {
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-xl);
-            box-shadow: var(--shadow-subtle);
-        }
-
-        .section-title {
-            font-family: var(--font-display);
-            font-size: 1.75rem;
-            margin-bottom: var(--spacing-sm);
-            letter-spacing: 0.02em;
-        }
-
-        .section-description {
-            color: var(--gray-medium);
-            margin-bottom: var(--spacing-lg);
-            line-height: 1.6;
-        }
-
-        .upload-zone {
-            border: 2px dashed var(--gray-light);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-2xl);
-            text-align: center;
-            cursor: pointer;
-            transition: var(--transition-medium);
-            position: relative;
-        }
-
-        .upload-zone:hover,
-        .upload-zone.dragover {
-            border-color: var(--gold);
-            background: rgba(212, 168, 83, 0.05);
-        }
-
-        .upload-zone input {
-            position: absolute;
-            inset: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .upload-icon {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto var(--spacing-md);
-            background: var(--cream);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .upload-icon svg {
-            width: 32px;
-            height: 32px;
-            color: var(--gold);
-        }
-
-        .upload-text {
-            font-weight: 600;
-            margin-bottom: var(--spacing-xs);
-        }
-
-        .upload-hint {
-            font-size: 0.875rem;
-            color: var(--gray-medium);
-        }
-
-        .import-preview {
-            margin-top: var(--spacing-xl);
-            display: none;
-        }
-
-        .import-preview.show {
-            display: block;
-        }
-
-        .preview-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: var(--spacing-md);
-        }
-
-        .preview-title {
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-        }
-
-        .preview-badge {
-            background: var(--success);
-            color: var(--white);
-            padding: 2px var(--spacing-sm);
-            border-radius: var(--radius-sm);
-            font-size: 0.75rem;
-        }
-
-        .preview-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.875rem;
-        }
-
-        .preview-table th,
-        .preview-table td {
-            padding: var(--spacing-sm) var(--spacing-md);
-            text-align: left;
-            border-bottom: 1px solid var(--gray-light);
-        }
-
-        .preview-table th {
-            background: var(--cream);
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.05em;
-        }
-
-        .preview-table tr:hover td {
-            background: rgba(212, 168, 83, 0.05);
-        }
-
-        .import-actions {
-            margin-top: var(--spacing-lg);
-            display: flex;
-            gap: var(--spacing-md);
-            justify-content: flex-end;
-        }
-
-        .btn {
-            padding: var(--spacing-md) var(--spacing-xl);
-            border-radius: var(--radius-md);
-            font-family: var(--font-body);
-            font-size: 0.875rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition-fast);
-            border: none;
-        }
-
-        .btn-primary {
-            background: var(--gold);
-            color: var(--black);
-        }
-
-        .btn-primary:hover {
-            background: var(--gold-light);
-        }
-
-        .btn-secondary {
-            background: var(--gray-light);
-            color: var(--black);
-        }
-
-        .btn-secondary:hover {
-            background: var(--gray-medium);
-            color: var(--white);
-        }
-
-        /* ========== EVENTS LIST ========== */
+        /* EVENTS LIST */
         .events-header {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .add-event-btn {
-            display: flex;
             align-items: center;
-            gap: var(--spacing-sm);
-            padding: var(--spacing-md) var(--spacing-lg);
+            margin-bottom: 24px;
+        }
+        .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; }
+        .add-btn {
+            padding: 12px 24px;
             background: var(--gold);
             color: var(--black);
             border: none;
-            border-radius: var(--radius-md);
+            border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
-            transition: var(--transition-fast);
         }
-
-        .add-event-btn:hover {
-            background: var(--gold-light);
-            transform: translateY(-2px);
-        }
-
-        .events-list {
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-md);
-        }
-
         .event-card {
             background: var(--white);
-            border-radius: var(--radius-md);
-            padding: var(--spacing-lg);
-            box-shadow: var(--shadow-subtle);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 12px;
             display: flex;
-            gap: var(--spacing-lg);
-            transition: var(--transition-fast);
+            gap: 20px;
             cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-
-        .event-card:hover {
-            box-shadow: var(--shadow-medium);
-            transform: translateY(-2px);
-        }
-
-        .event-date-box {
-            min-width: 60px;
+        .event-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+        .event-date {
             text-align: center;
-            padding: var(--spacing-sm);
+            padding: 8px;
             background: var(--cream);
-            border-radius: var(--radius-md);
+            border-radius: 8px;
+            min-width: 60px;
         }
+        .event-date-day { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; }
+        .event-date-month { font-size: 11px; color: var(--gray); text-transform: uppercase; }
+        .event-info { flex: 1; }
+        .event-title { font-weight: 600; margin-bottom: 4px; }
+        .event-meta { font-size: 13px; color: var(--gray); }
 
-        .event-date-day {
-            font-family: var(--font-display);
-            font-size: 2rem;
-            line-height: 1;
+        /* IMPORT */
+        .import-box {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 32px;
         }
-
-        .event-date-month {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--gray-medium);
+        .upload-zone {
+            border: 2px dashed var(--gray-light);
+            border-radius: 12px;
+            padding: 48px;
+            text-align: center;
+            cursor: pointer;
+            margin-top: 20px;
         }
+        .upload-zone:hover { border-color: var(--gold); }
+        .upload-zone input { display: none; }
+        .upload-icon { font-size: 48px; margin-bottom: 16px; }
+        .preview { margin-top: 24px; display: none; }
+        .preview.show { display: block; }
+        .preview table { width: 100%; border-collapse: collapse; }
+        .preview th, .preview td { padding: 12px; text-align: left; border-bottom: 1px solid var(--gray-light); }
+        .preview th { background: var(--cream); font-size: 12px; text-transform: uppercase; }
+        .import-actions { margin-top: 20px; display: flex; gap: 12px; justify-content: flex-end; }
+        .btn { padding: 12px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; }
+        .btn-primary { background: var(--gold); color: var(--black); }
+        .btn-secondary { background: var(--gray-light); color: var(--black); }
 
-        .event-info {
-            flex: 1;
-        }
-
-        .event-title {
-            font-weight: 600;
-            margin-bottom: var(--spacing-xs);
-        }
-
-        .event-meta {
-            display: flex;
-            gap: var(--spacing-lg);
-            font-size: 0.875rem;
-            color: var(--gray-medium);
-        }
-
-        .event-meta-item {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-xs);
-        }
-
-        .event-type-badge {
-            padding: var(--spacing-xs) var(--spacing-sm);
-            border-radius: var(--radius-sm);
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .event-type-badge.training {
-            background: rgba(212, 168, 83, 0.2);
-            color: var(--gold);
-        }
-
-        .event-type-badge.match {
-            background: rgba(0, 82, 159, 0.2);
-            color: var(--accent-blue);
-        }
-
-        .event-type-badge.meeting {
-            background: rgba(45, 45, 45, 0.2);
-            color: var(--gray-dark);
-        }
-
-        /* ========== MODAL ========== */
+        /* MODAL */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0,0,0,0.6);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 1000;
             opacity: 0;
             visibility: hidden;
-            transition: var(--transition-medium);
-            padding: var(--spacing-lg);
+            padding: 20px;
         }
-
-        .modal-overlay.show {
-            opacity: 1;
-            visibility: visible;
-        }
-
+        .modal-overlay.show { opacity: 1; visibility: visible; }
         .modal {
             background: var(--white);
-            border-radius: var(--radius-lg);
+            border-radius: 12px;
             width: 100%;
-            max-width: 500px;
+            max-width: 450px;
             max-height: 90vh;
             overflow-y: auto;
-            transform: translateY(20px);
-            transition: var(--transition-medium);
         }
-
-        .modal-overlay.show .modal {
-            transform: translateY(0);
-        }
-
         .modal-header {
-            padding: var(--spacing-lg);
+            padding: 20px;
             border-bottom: 1px solid var(--gray-light);
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
         }
-
-        .modal-title {
-            font-family: var(--font-display);
-            font-size: 1.5rem;
-        }
-
+        .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; }
         .modal-close {
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: var(--cream);
             border: none;
+            background: var(--cream);
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition-fast);
+            font-size: 18px;
         }
-
-        .modal-close:hover {
-            background: var(--gray-light);
-        }
-
-        .modal-body {
-            padding: var(--spacing-lg);
-        }
-
+        .modal-body { padding: 20px; }
         .modal-footer {
-            padding: var(--spacing-lg);
+            padding: 20px;
             border-top: 1px solid var(--gray-light);
             display: flex;
-            gap: var(--spacing-md);
+            gap: 12px;
             justify-content: flex-end;
         }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: var(--spacing-md);
-        }
-
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
         .form-select {
             width: 100%;
-            padding: var(--spacing-md);
+            padding: 14px;
             border: 2px solid var(--gray-light);
-            border-radius: var(--radius-md);
-            font-family: var(--font-body);
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 16px;
             background: var(--white);
-            cursor: pointer;
         }
 
-        .form-select:focus {
-            outline: none;
-            border-color: var(--gold);
-        }
-
-        .form-textarea {
-            width: 100%;
-            padding: var(--spacing-md);
-            border: 2px solid var(--gray-light);
-            border-radius: var(--radius-md);
-            font-family: var(--font-body);
-            font-size: 1rem;
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .form-textarea:focus {
-            outline: none;
-            border-color: var(--gold);
-        }
-
-        /* ========== NOTIFICATIONS ========== */
-        .notification-settings {
-            background: var(--white);
-            border-radius: var(--radius-lg);
-            padding: var(--spacing-xl);
-            box-shadow: var(--shadow-subtle);
-        }
-
-        .notification-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: var(--spacing-md) 0;
-            border-bottom: 1px solid var(--gray-light);
-        }
-
-        .notification-item:last-child {
-            border-bottom: none;
-        }
-
-        .notification-info h4 {
-            font-weight: 600;
-            margin-bottom: var(--spacing-xs);
-        }
-
-        .notification-info p {
-            font-size: 0.875rem;
-            color: var(--gray-medium);
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 50px;
-            height: 28px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            inset: 0;
-            background: var(--gray-light);
-            border-radius: 28px;
-            transition: var(--transition-fast);
-        }
-
-        .toggle-slider::before {
-            content: '';
-            position: absolute;
-            height: 22px;
-            width: 22px;
-            left: 3px;
-            bottom: 3px;
-            background: var(--white);
-            border-radius: 50%;
-            transition: var(--transition-fast);
-            box-shadow: var(--shadow-subtle);
-        }
-
-        .toggle-switch input:checked + .toggle-slider {
-            background: var(--gold);
-        }
-
-        .toggle-switch input:checked + .toggle-slider::before {
-            transform: translateX(22px);
-        }
-
-        /* ========== TOAST NOTIFICATIONS ========== */
-        .toast-container {
-            position: fixed;
-            bottom: var(--spacing-lg);
-            right: var(--spacing-lg);
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            gap: var(--spacing-sm);
-        }
-
+        /* TOAST */
+        .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; }
         .toast {
             background: var(--black);
             color: var(--white);
-            padding: var(--spacing-md) var(--spacing-lg);
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-strong);
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-md);
-            animation: toastIn 0.3s ease;
-            max-width: 350px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            margin-top: 8px;
+            animation: slideIn 0.3s ease;
         }
+        .toast.success { border-left: 4px solid #2e7d32; }
+        .toast.error { border-left: 4px solid #c62828; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
-        .toast.success {
-            border-left: 4px solid var(--success);
-        }
-
-        .toast.error {
-            border-left: 4px solid var(--error);
-        }
-
-        .toast.warning {
-            border-left: 4px solid var(--warning);
-        }
-
-        @keyframes toastIn {
-            from {
-                opacity: 0;
-                transform: translateX(100%);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        /* ========== RESPONSIVE ========== */
-        @media (max-width: 768px) {
-            .calendar-day {
-                min-height: 80px;
-                padding: var(--spacing-xs);
-            }
-
-            .day-number {
-                width: 24px;
-                height: 24px;
-                font-size: 0.75rem;
-            }
-
-            .event-pill {
-                font-size: 0.6rem;
-                padding: 1px 3px;
-            }
-
-            .month-title {
-                font-size: 1.5rem;
-                min-width: 150px;
-            }
-
-            .main-content {
-                padding: var(--spacing-md);
-            }
-
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-
-            .event-card {
-                flex-direction: column;
-                gap: var(--spacing-md);
-            }
-
-            .event-date-box {
-                display: flex;
-                align-items: center;
-                gap: var(--spacing-sm);
-            }
-
-            .event-date-day {
-                font-size: 1.5rem;
-            }
-
-            .events-header {
-                flex-direction: column;
-                gap: var(--spacing-md);
-                align-items: stretch;
-            }
-
-            .calendar-header {
-                flex-direction: column;
-                gap: var(--spacing-md);
-            }
-        }
-
-        @media (max-width: 480px) {
-            .weekday {
-                font-size: 0.6rem;
-                padding: var(--spacing-sm);
-            }
-
-            .nav-tabs {
-                padding: 0 var(--spacing-sm);
-            }
-
-            .nav-tab {
-                padding: var(--spacing-sm) var(--spacing-md);
-                font-size: 0.8rem;
-            }
-        }
-
-        /* Hidden utility */
-        .hidden {
-            display: none !important;
-        }
+        .empty-state { text-align: center; padding: 48px; color: var(--gray); }
     </style>
 </head>
 <body>
-    <!-- LOGIN SCREEN -->
+    <!-- LOGIN -->
     <div class="login-screen" id="loginScreen">
-        <div class="login-container">
-            <div class="login-header">
-                <div class="login-badge">
-                    <svg viewBox="0 0 100 100" fill="none">
-                        <circle cx="50" cy="50" r="45" stroke="#D4A853" stroke-width="3"/>
-                        <text x="50" y="58" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="28" fill="#1A1A1A">RM</text>
-                    </svg>
-                </div>
-                <h1 class="login-title">PREBENJAMÍN B</h1>
-                <p class="login-subtitle">Calendario Técnico</p>
-            </div>
-            <form class="login-form" id="loginForm">
-                <div class="login-error" id="loginError">
-                    Usuario o contraseña incorrectos
+        <div class="login-box">
+            <h1 class="login-title">PREBENJAMÍN <span>B</span></h1>
+            <div class="login-error" id="loginError">Usuario o contraseña incorrectos</div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Usuario</label>
+                    <input type="text" class="form-input" id="username" placeholder="Tu usuario" required>
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="username">Usuario</label>
-                    <input type="text" class="form-input" id="username" placeholder="Introduce tu usuario" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="password">Contraseña</label>
-                    <input type="password" class="form-input" id="password" placeholder="Introduce tu contraseña" required>
+                    <label class="form-label">Contraseña</label>
+                    <input type="password" class="form-input" id="password" placeholder="Tu contraseña" required>
                 </div>
                 <button type="submit" class="login-btn">ACCEDER</button>
             </form>
         </div>
     </div>
 
-    <!-- MAIN APP -->
+    <!-- APP -->
     <div class="app" id="app">
-        <header class="app-header">
-            <div class="header-left">
-                <div class="header-badge">
-                    <svg viewBox="0 0 100 100" fill="none">
-                        <circle cx="50" cy="50" r="45" stroke="#D4A853" stroke-width="3"/>
-                        <text x="50" y="58" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="28" fill="#1A1A1A">RM</text>
-                    </svg>
-                </div>
-                <h1 class="header-title">PREBENJAMÍN B</h1>
-            </div>
+        <header class="header">
+            <h1 class="header-title">PREBENJAMÍN B</h1>
             <div class="header-user">
-                <span class="user-name" id="currentUserName"></span>
+                <span class="user-name" id="userName"></span>
                 <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
             </div>
         </header>
 
-        <nav class="nav-tabs">
-            <button class="nav-tab active" data-tab="calendar">Calendario</button>
-            <button class="nav-tab" data-tab="events">Eventos</button>
-            <button class="nav-tab" data-tab="import">Importar Excel</button>
-            <button class="nav-tab" data-tab="settings">Ajustes</button>
+        <nav class="tabs">
+            <button class="tab active" data-tab="calendar">Calendario</button>
+            <button class="tab" data-tab="events">Eventos</button>
+            <button class="tab" data-tab="import">Importar Excel</button>
         </nav>
 
-        <main class="main-content">
-            <!-- Calendar Tab -->
-            <div class="tab-panel active" id="calendarPanel">
+        <main class="content">
+            <!-- Calendar Panel -->
+            <div class="panel active" id="calendarPanel">
                 <div class="calendar-header">
-                    <div class="month-navigation">
-                        <button class="nav-btn" id="prevMonth">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M15 18l-6-6 6-6"/>
-                            </svg>
-                        </button>
+                    <div class="month-nav">
+                        <button class="nav-btn" id="prevMonth">←</button>
                         <h2 class="month-title" id="monthTitle"></h2>
-                        <button class="nav-btn" id="nextMonth">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 18l6-6-6-6"/>
-                            </svg>
-                        </button>
+                        <button class="nav-btn" id="nextMonth">→</button>
                     </div>
                     <button class="today-btn" id="todayBtn">Hoy</button>
                 </div>
-                <div class="calendar-grid">
-                    <div class="calendar-weekdays">
+                <div class="calendar">
+                    <div class="weekdays">
                         <div class="weekday">Lun</div>
                         <div class="weekday">Mar</div>
                         <div class="weekday">Mié</div>
@@ -1251,382 +411,171 @@
                         <div class="weekday">Sáb</div>
                         <div class="weekday">Dom</div>
                     </div>
-                    <div class="calendar-days" id="calendarDays"></div>
+                    <div class="days" id="calendarDays"></div>
                 </div>
             </div>
 
-            <!-- Events Tab -->
-            <div class="tab-panel" id="eventsPanel">
+            <!-- Events Panel -->
+            <div class="panel" id="eventsPanel">
                 <div class="events-header">
                     <h2 class="section-title">PRÓXIMOS EVENTOS</h2>
-                    <button class="add-event-btn" id="addEventBtn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 5v14M5 12h14"/>
-                        </svg>
-                        Añadir evento
-                    </button>
+                    <button class="add-btn" id="addEventBtn">+ Añadir evento</button>
                 </div>
-                <div class="events-list" id="eventsList"></div>
+                <div id="eventsList"></div>
             </div>
 
-            <!-- Import Tab -->
-            <div class="tab-panel" id="importPanel">
-                <div class="import-section">
+            <!-- Import Panel -->
+            <div class="panel" id="importPanel">
+                <div class="import-box">
                     <h2 class="section-title">IMPORTAR HORARIO</h2>
-                    <p class="section-description">
-                        Sube el Excel con el horario de la cantera. La aplicación detectará automáticamente 
-                        los entrenamientos del Prebenjamín B (días, horarios y campos).
-                    </p>
+                    <p style="color: var(--gray); margin-top: 8px;">Sube el Excel con el horario de la cantera</p>
                     <div class="upload-zone" id="uploadZone">
                         <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
-                        <div class="upload-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="17 8 12 3 7 8"/>
-                                <line x1="12" y1="3" x2="12" y2="15"/>
-                            </svg>
-                        </div>
-                        <p class="upload-text">Arrastra el archivo aquí o haz clic para seleccionar</p>
-                        <p class="upload-hint">Formatos aceptados: .xlsx, .xls, .csv</p>
+                        <div class="upload-icon">📁</div>
+                        <p><strong>Arrastra el archivo aquí</strong></p>
+                        <p style="color: var(--gray); font-size: 14px;">o haz clic para seleccionar</p>
                     </div>
-
-                    <div class="import-preview" id="importPreview">
-                        <div class="preview-header">
-                            <span class="preview-title">
-                                Entrenamientos detectados
-                                <span class="preview-badge" id="previewCount">0</span>
-                            </span>
-                        </div>
-                        <table class="preview-table">
-                            <thead>
-                                <tr>
-                                    <th>Día</th>
-                                    <th>Hora</th>
-                                    <th>Campo</th>
-                                </tr>
-                            </thead>
+                    <div class="preview" id="preview">
+                        <h3 style="margin-bottom: 16px;">Entrenamientos detectados</h3>
+                        <table>
+                            <thead><tr><th>Día</th><th>Hora</th><th>Campo</th></tr></thead>
                             <tbody id="previewBody"></tbody>
                         </table>
                         <div class="import-actions">
                             <button class="btn btn-secondary" id="cancelImport">Cancelar</button>
-                            <button class="btn btn-primary" id="confirmImport">Importar al calendario</button>
+                            <button class="btn btn-primary" id="confirmImport">Importar</button>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Settings Tab -->
-            <div class="tab-panel" id="settingsPanel">
-                <div class="notification-settings">
-                    <h2 class="section-title">NOTIFICACIONES</h2>
-                    <p class="section-description">Configura las alertas para los eventos del equipo.</p>
-                    
-                    <div class="notification-item">
-                        <div class="notification-info">
-                            <h4>Notificaciones push</h4>
-                            <p>Recibe alertas en tu dispositivo</p>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="pushNotifications">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-
-                    <div class="notification-item">
-                        <div class="notification-info">
-                            <h4>Recordatorio de entrenamientos</h4>
-                            <p>Aviso 1 hora antes del entrenamiento</p>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="trainingReminder" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-
-                    <div class="notification-item">
-                        <div class="notification-info">
-                            <h4>Recordatorio de partidos</h4>
-                            <p>Aviso 2 horas antes del partido</p>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="matchReminder" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-
-                    <div class="notification-item">
-                        <div class="notification-info">
-                            <h4>Cambios en el calendario</h4>
-                            <p>Aviso cuando se modifique un evento</p>
-                        </div>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="changeNotifications" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Event Modal -->
-    <div class="modal-overlay" id="eventModal">
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
         <div class="modal">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalTitle">NUEVO EVENTO</h3>
-                <button class="modal-close" id="closeModal">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 6L6 18M6 6l12 12"/>
-                    </svg>
-                </button>
+                <button class="modal-close" id="modalClose">×</button>
             </div>
             <div class="modal-body">
-                <form id="eventForm">
+                <div class="form-group">
+                    <label class="form-label">Título</label>
+                    <input type="text" class="form-input" id="eventTitle" placeholder="Ej: Entrenamiento">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tipo</label>
+                    <select class="form-select" id="eventType">
+                        <option value="training">Entrenamiento</option>
+                        <option value="match">Partido</option>
+                        <option value="meeting">Reunión</option>
+                    </select>
+                </div>
+                <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">Título</label>
-                        <input type="text" class="form-input" id="eventTitle" placeholder="Ej: Entrenamiento" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Tipo de evento</label>
-                        <select class="form-select" id="eventType">
-                            <option value="training">Entrenamiento</option>
-                            <option value="match">Partido</option>
-                            <option value="meeting">Reunión</option>
-                            <option value="other">Otro</option>
-                        </select>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label">Fecha</label>
-                            <input type="date" class="form-input" id="eventDate" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Hora</label>
-                            <input type="time" class="form-input" id="eventTime" required>
-                        </div>
+                        <label class="form-label">Fecha</label>
+                        <input type="date" class="form-input" id="eventDate">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Campo / Ubicación</label>
-                        <input type="text" class="form-input" id="eventLocation" placeholder="Ej: Campo 8B">
+                        <label class="form-label">Hora</label>
+                        <input type="time" class="form-input" id="eventTime" value="17:00">
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Notas</label>
-                        <textarea class="form-textarea" id="eventNotes" placeholder="Añade notas adicionales..."></textarea>
-                    </div>
-                </form>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Campo / Ubicación</label>
+                    <input type="text" class="form-input" id="eventLocation" placeholder="Ej: Campo 8B">
+                </div>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" id="deleteEvent" style="display: none;">Eliminar</button>
-                <button class="btn btn-primary" id="saveEvent">Guardar evento</button>
+                <button class="btn btn-secondary" id="deleteBtn" style="display:none;">Eliminar</button>
+                <button class="btn btn-primary" id="saveBtn">Guardar</button>
             </div>
         </div>
     </div>
 
-    <!-- Toast Container -->
-    <div class="toast-container" id="toastContainer"></div>
+    <div class="toast-container" id="toasts"></div>
 
     <script>
-        // ========== SUPABASE CONFIG ==========
+        // ===== CONFIG =====
         const SUPABASE_URL = 'https://bxawlznatchqdvpdrjuh.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4YXdsem5hdGNocWR2cGRyanVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MjQ2NTgsImV4cCI6MjA4NTAwMDY1OH0.rS4_yPqMo48xwWptIDrcVxpQq_DVsImoxxPTDPTqDRU';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ4YXdsem5hdGNocWR2cGRyanVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk0MjQ2NTgsImV4cCI6MjA4NTAwMDY1OH0.rS4_yPqMo48xwWptIDrcVxpQq_DVsImoxxPTDPTqDRU';
 
-        // ========== APP STATE ==========
-        const APP_STATE = {
-            currentUser: null,
-            currentDate: new Date(),
-            events: [],
-            editingEventId: null,
-            importedTrainings: []
-        };
-
-        // Users database (in production, this would be server-side)
         const USERS = {
-            'raul': { password: 'preb2026', name: 'Raul', role: 'Primer Entrenador' },
-            'sergio': { password: 'preb2026', name: 'Sergio', role: 'Segundo Entrenador' }
+            'raul': { password: 'preb2026', name: 'Raul' },
+            'sergio': { password: 'preb2026', name: 'Sergio' }
         };
 
-        // Storage keys
-        const STORAGE_KEYS = {
-            events: 'prebenjamin_events',
-            user: 'prebenjamin_user',
-            settings: 'prebenjamin_settings'
-        };
+        // ===== STATE =====
+        let currentUser = null;
+        let currentDate = new Date();
+        let events = [];
+        let editingId = null;
+        let importedData = [];
 
-        // Supabase API helper
-        async function supabaseRequest(endpoint, method = 'GET', body = null) {
-            const options = {
+        const MONTHS = ['ENERO','FEBRERO','MARZO','ABRIL','MAYO','JUNIO','JULIO','AGOSTO','SEPTIEMBRE','OCTUBRE','NOVIEMBRE','DICIEMBRE'];
+
+        // ===== SUPABASE =====
+        async function dbFetch(endpoint, method = 'GET', body = null) {
+            const opts = {
                 method,
                 headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': 'Bearer ' + SUPABASE_KEY,
                     'Content-Type': 'application/json',
-                    'Prefer': method === 'POST' ? 'return=representation' : undefined
+                    'Prefer': 'return=representation'
                 }
             };
-            if (body) options.body = JSON.stringify(body);
-            
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/${endpoint}`, options);
-            if (!response.ok) {
-                throw new Error(`Supabase error: ${response.status}`);
-            }
-            const text = await response.text();
+            if (body) opts.body = JSON.stringify(body);
+            const res = await fetch(SUPABASE_URL + '/rest/v1/' + endpoint, opts);
+            const text = await res.text();
             return text ? JSON.parse(text) : null;
-        }
-
-        // ========== UTILITY FUNCTIONS ==========
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2);
-        }
-
-        function formatDate(date) {
-            return date.toISOString().split('T')[0];
-        }
-
-        function formatTime(date) {
-            return date.toTimeString().slice(0, 5);
-        }
-
-        function parseDate(dateStr) {
-            const [year, month, day] = dateStr.split('-').map(Number);
-            return new Date(year, month - 1, day);
-        }
-
-        const MONTH_NAMES = [
-            'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO',
-            'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'
-        ];
-
-        const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-
-        // ========== STORAGE FUNCTIONS (SUPABASE) ==========
-        async function saveEvents() {
-            // También guardar en localStorage como backup
-            localStorage.setItem(STORAGE_KEYS.events, JSON.stringify(APP_STATE.events));
         }
 
         async function loadEvents() {
             try {
-                const data = await supabaseRequest('events?select=*');
-                if (data && data.length > 0) {
-                    APP_STATE.events = data;
-                    localStorage.setItem(STORAGE_KEYS.events, JSON.stringify(data));
-                } else {
-                    // Si no hay datos en Supabase, cargar desde localStorage
-                    const stored = localStorage.getItem(STORAGE_KEYS.events);
-                    if (stored) {
-                        APP_STATE.events = JSON.parse(stored);
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading from Supabase:', error);
-                // Fallback a localStorage
-                const stored = localStorage.getItem(STORAGE_KEYS.events);
-                if (stored) {
-                    APP_STATE.events = JSON.parse(stored);
-                }
-                showToast('Modo offline - cambios guardados localmente', 'warning');
+                const data = await dbFetch('events?select=*&order=date.asc');
+                events = data || [];
+            } catch (e) {
+                console.error(e);
+                events = JSON.parse(localStorage.getItem('events') || '[]');
             }
         }
 
-        async function saveEventToSupabase(event) {
+        async function saveEvent(event) {
             try {
-                await supabaseRequest('events', 'POST', event);
-            } catch (error) {
-                console.error('Error saving to Supabase:', error);
-                showToast('Error de conexión - guardado localmente', 'warning');
-            }
+                await dbFetch('events', 'POST', event);
+            } catch (e) { console.error(e); }
+            localStorage.setItem('events', JSON.stringify(events));
         }
 
-        async function updateEventInSupabase(event) {
+        async function updateEvent(event) {
             try {
-                await supabaseRequest(`events?id=eq.${event.id}`, 'PATCH', event);
-            } catch (error) {
-                console.error('Error updating in Supabase:', error);
-                showToast('Error de conexión - guardado localmente', 'warning');
-            }
+                await dbFetch('events?id=eq.' + event.id, 'PATCH', event);
+            } catch (e) { console.error(e); }
+            localStorage.setItem('events', JSON.stringify(events));
         }
 
-        async function deleteEventFromSupabase(eventId) {
+        async function deleteEvent(id) {
             try {
-                await supabaseRequest(`events?id=eq.${eventId}`, 'DELETE');
-            } catch (error) {
-                console.error('Error deleting from Supabase:', error);
-            }
+                await dbFetch('events?id=eq.' + id, 'DELETE');
+            } catch (e) { console.error(e); }
+            localStorage.setItem('events', JSON.stringify(events));
         }
 
-        function saveUser() {
-            if (APP_STATE.currentUser) {
-                localStorage.setItem(STORAGE_KEYS.user, APP_STATE.currentUser);
-            } else {
-                localStorage.removeItem(STORAGE_KEYS.user);
-            }
-        }
-
-        function loadUser() {
-            return localStorage.getItem(STORAGE_KEYS.user);
-        }
-
-        function saveSettings() {
-            const settings = {
-                pushNotifications: document.getElementById('pushNotifications').checked,
-                trainingReminder: document.getElementById('trainingReminder').checked,
-                matchReminder: document.getElementById('matchReminder').checked,
-                changeNotifications: document.getElementById('changeNotifications').checked
-            };
-            localStorage.setItem(STORAGE_KEYS.settings, JSON.stringify(settings));
-        }
-
-        function loadSettings() {
-            const stored = localStorage.getItem(STORAGE_KEYS.settings);
-            if (stored) {
-                const settings = JSON.parse(stored);
-                document.getElementById('pushNotifications').checked = settings.pushNotifications || false;
-                document.getElementById('trainingReminder').checked = settings.trainingReminder !== false;
-                document.getElementById('matchReminder').checked = settings.matchReminder !== false;
-                document.getElementById('changeNotifications').checked = settings.changeNotifications !== false;
-            }
-        }
-
-        // ========== TOAST NOTIFICATIONS ==========
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    ${type === 'success' ? '<path d="M20 6L9 17l-5-5"/>' : 
-                      type === 'error' ? '<circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/>' :
-                      '<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>'}
-                </svg>
-                <span>${message}</span>
-            `;
-            container.appendChild(toast);
-
-            setTimeout(() => {
-                toast.style.animation = 'toastIn 0.3s ease reverse';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
-
-        // ========== AUTHENTICATION ==========
-        function login(username, password) {
-            const user = USERS[username.toLowerCase()];
-            if (user && user.password === password) {
-                APP_STATE.currentUser = username.toLowerCase();
-                saveUser();
-                return user;
+        // ===== AUTH =====
+        function login(user, pass) {
+            const u = USERS[user.toLowerCase()];
+            if (u && u.password === pass) {
+                currentUser = user.toLowerCase();
+                localStorage.setItem('user', currentUser);
+                return u;
             }
             return null;
         }
 
         function logout() {
-            APP_STATE.currentUser = null;
-            saveUser();
-            showLoginScreen();
-        }
-
-        function showLoginScreen() {
+            currentUser = null;
+            localStorage.removeItem('user');
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('app').classList.remove('active');
         }
@@ -1634,638 +583,326 @@
         async function showApp() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('app').classList.add('active');
-            
-            const user = USERS[APP_STATE.currentUser];
-            document.getElementById('currentUserName').textContent = user.name;
-            
+            document.getElementById('userName').textContent = USERS[currentUser].name;
             await loadEvents();
-            loadSettings();
             renderCalendar();
-            renderEventsList();
+            renderEvents();
         }
 
-        // ========== CALENDAR RENDERING ==========
+        // ===== TOAST =====
+        function toast(msg, type = 'success') {
+            const t = document.createElement('div');
+            t.className = 'toast ' + type;
+            t.textContent = msg;
+            document.getElementById('toasts').appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
+        // ===== CALENDAR =====
         function renderCalendar() {
-            const year = APP_STATE.currentDate.getFullYear();
-            const month = APP_STATE.currentDate.getMonth();
-            
-            document.getElementById('monthTitle').textContent = `${MONTH_NAMES[month]} ${year}`;
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            document.getElementById('monthTitle').textContent = MONTHS[month] + ' ' + year;
 
             const firstDay = new Date(year, month, 1);
             const lastDay = new Date(year, month + 1, 0);
-            const startDay = (firstDay.getDay() + 6) % 7; // Monday = 0
+            const startDay = (firstDay.getDay() + 6) % 7;
             const totalDays = lastDay.getDate();
-
-            const today = new Date();
-            const todayStr = formatDate(today);
+            const today = new Date().toISOString().split('T')[0];
 
             let html = '';
-            
-            // Previous month days
             const prevMonth = new Date(year, month, 0);
-            const prevMonthDays = prevMonth.getDate();
             for (let i = startDay - 1; i >= 0; i--) {
-                const day = prevMonthDays - i;
-                const dateStr = formatDate(new Date(year, month - 1, day));
-                html += renderDay(day, dateStr, true, false);
+                const d = prevMonth.getDate() - i;
+                html += '<div class="day other"><div class="day-num">' + d + '</div></div>';
             }
 
-            // Current month days
-            for (let day = 1; day <= totalDays; day++) {
-                const dateStr = formatDate(new Date(year, month, day));
-                const isToday = dateStr === todayStr;
-                html += renderDay(day, dateStr, false, isToday);
+            for (let d = 1; d <= totalDays; d++) {
+                const dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+                const isToday = dateStr === today;
+                const dayEvents = events.filter(e => e.date === dateStr);
+                
+                html += '<div class="day' + (isToday ? ' today' : '') + '" data-date="' + dateStr + '">';
+                html += '<div class="day-num">' + d + '</div>';
+                dayEvents.slice(0, 2).forEach(e => {
+                    html += '<div class="event-dot ' + e.type + '">' + e.title + '</div>';
+                });
+                if (dayEvents.length > 2) html += '<div class="event-dot" style="background:#ddd;">+' + (dayEvents.length - 2) + '</div>';
+                html += '</div>';
             }
 
-            // Next month days
-            const remainingDays = 42 - (startDay + totalDays);
-            for (let day = 1; day <= remainingDays; day++) {
-                const dateStr = formatDate(new Date(year, month + 1, day));
-                html += renderDay(day, dateStr, true, false);
+            const remaining = 42 - (startDay + totalDays);
+            for (let d = 1; d <= remaining; d++) {
+                html += '<div class="day other"><div class="day-num">' + d + '</div></div>';
             }
 
             document.getElementById('calendarDays').innerHTML = html;
 
-            // Add click handlers to days
-            document.querySelectorAll('.calendar-day').forEach(dayEl => {
-                dayEl.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('event-pill')) return;
-                    const date = dayEl.dataset.date;
-                    openEventModal(null, date);
-                });
-            });
-
-            // Add click handlers to event pills
-            document.querySelectorAll('.event-pill').forEach(pill => {
-                pill.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const eventId = pill.dataset.id;
-                    openEventModal(eventId);
-                });
+            document.querySelectorAll('.day:not(.other)').forEach(day => {
+                day.onclick = () => openModal(null, day.dataset.date);
             });
         }
 
-        function renderDay(day, dateStr, isOtherMonth, isToday) {
-            const dayEvents = APP_STATE.events.filter(e => e.date === dateStr);
-            const eventsHtml = dayEvents.slice(0, 3).map(e => `
-                <div class="event-pill ${e.type}" data-id="${e.id}" title="${e.title}">
-                    ${e.title}
-                </div>
-            `).join('');
+        // ===== EVENTS LIST =====
+        function renderEvents() {
+            const today = new Date().toISOString().split('T')[0];
+            const upcoming = events.filter(e => e.date >= today).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 20);
 
-            const moreCount = dayEvents.length > 3 ? `<div class="event-pill other">+${dayEvents.length - 3} más</div>` : '';
-
-            return `
-                <div class="calendar-day ${isOtherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}" data-date="${dateStr}">
-                    <div class="day-number">${day}</div>
-                    <div class="day-events">
-                        ${eventsHtml}
-                        ${moreCount}
-                    </div>
-                </div>
-            `;
-        }
-
-        function navigateMonth(delta) {
-            APP_STATE.currentDate.setMonth(APP_STATE.currentDate.getMonth() + delta);
-            renderCalendar();
-        }
-
-        function goToToday() {
-            APP_STATE.currentDate = new Date();
-            renderCalendar();
-        }
-
-        // ========== EVENTS LIST ==========
-        function renderEventsList() {
-            const today = formatDate(new Date());
-            const upcomingEvents = APP_STATE.events
-                .filter(e => e.date >= today)
-                .sort((a, b) => {
-                    if (a.date !== b.date) return a.date.localeCompare(b.date);
-                    return a.time.localeCompare(b.time);
-                })
-                .slice(0, 20);
-
-            if (upcomingEvents.length === 0) {
-                document.getElementById('eventsList').innerHTML = `
-                    <div style="text-align: center; padding: 48px; color: var(--gray-medium);">
-                        <p>No hay eventos próximos</p>
-                        <p style="margin-top: 8px; font-size: 0.875rem;">Añade un evento o importa el horario desde Excel</p>
-                    </div>
-                `;
+            if (upcoming.length === 0) {
+                document.getElementById('eventsList').innerHTML = '<div class="empty-state">No hay eventos próximos</div>';
                 return;
             }
 
-            const html = upcomingEvents.map(event => {
-                const date = parseDate(event.date);
-                const dayNum = date.getDate();
-                const monthShort = MONTH_NAMES[date.getMonth()].slice(0, 3);
-
-                return `
-                    <div class="event-card" data-id="${event.id}">
-                        <div class="event-date-box">
-                            <span class="event-date-day">${dayNum}</span>
-                            <span class="event-date-month">${monthShort}</span>
-                        </div>
-                        <div class="event-info">
-                            <div class="event-title">${event.title}</div>
-                            <div class="event-meta">
-                                <span class="event-meta-item">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <circle cx="12" cy="12" r="10"/>
-                                        <polyline points="12 6 12 12 16 14"/>
-                                    </svg>
-                                    ${event.time}
-                                </span>
-                                ${event.location ? `
-                                    <span class="event-meta-item">
-                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                                            <circle cx="12" cy="10" r="3"/>
-                                        </svg>
-                                        ${event.location}
-                                    </span>
-                                ` : ''}
-                            </div>
-                        </div>
-                        <span class="event-type-badge ${event.type}">
-                            ${event.type === 'training' ? 'Entrenamiento' : 
-                              event.type === 'match' ? 'Partido' : 
-                              event.type === 'meeting' ? 'Reunión' : 'Otro'}
-                        </span>
-                    </div>
-                `;
-            }).join('');
+            let html = '';
+            upcoming.forEach(e => {
+                const [y, m, d] = e.date.split('-');
+                html += '<div class="event-card" data-id="' + e.id + '">';
+                html += '<div class="event-date"><div class="event-date-day">' + parseInt(d) + '</div><div class="event-date-month">' + MONTHS[parseInt(m) - 1].slice(0, 3) + '</div></div>';
+                html += '<div class="event-info"><div class="event-title">' + e.title + '</div><div class="event-meta">' + e.time + (e.location ? ' · ' + e.location : '') + '</div></div>';
+                html += '</div>';
+            });
 
             document.getElementById('eventsList').innerHTML = html;
-
-            // Add click handlers
             document.querySelectorAll('.event-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    openEventModal(card.dataset.id);
-                });
+                card.onclick = () => openModal(card.dataset.id);
             });
         }
 
-        // ========== EVENT MODAL ==========
-        function openEventModal(eventId = null, date = null) {
-            APP_STATE.editingEventId = eventId;
-            const modal = document.getElementById('eventModal');
-            const form = document.getElementById('eventForm');
-            const deleteBtn = document.getElementById('deleteEvent');
-            const modalTitle = document.getElementById('modalTitle');
-
-            form.reset();
-
-            if (eventId) {
-                const event = APP_STATE.events.find(e => e.id === eventId);
-                if (event) {
-                    modalTitle.textContent = 'EDITAR EVENTO';
-                    document.getElementById('eventTitle').value = event.title;
-                    document.getElementById('eventType').value = event.type;
-                    document.getElementById('eventDate').value = event.date;
-                    document.getElementById('eventTime').value = event.time;
-                    document.getElementById('eventLocation').value = event.location || '';
-                    document.getElementById('eventNotes').value = event.notes || '';
-                    deleteBtn.style.display = 'block';
-                }
+        // ===== MODAL =====
+        function openModal(id = null, date = null) {
+            editingId = id;
+            const modal = document.getElementById('modal');
+            
+            if (id) {
+                const e = events.find(x => x.id === id);
+                document.getElementById('modalTitle').textContent = 'EDITAR EVENTO';
+                document.getElementById('eventTitle').value = e.title;
+                document.getElementById('eventType').value = e.type;
+                document.getElementById('eventDate').value = e.date;
+                document.getElementById('eventTime').value = e.time;
+                document.getElementById('eventLocation').value = e.location || '';
+                document.getElementById('deleteBtn').style.display = 'block';
             } else {
-                modalTitle.textContent = 'NUEVO EVENTO';
-                document.getElementById('eventDate').value = date || formatDate(new Date());
+                document.getElementById('modalTitle').textContent = 'NUEVO EVENTO';
+                document.getElementById('eventTitle').value = '';
+                document.getElementById('eventType').value = 'training';
+                document.getElementById('eventDate').value = date || new Date().toISOString().split('T')[0];
                 document.getElementById('eventTime').value = '17:00';
-                deleteBtn.style.display = 'none';
+                document.getElementById('eventLocation').value = '';
+                document.getElementById('deleteBtn').style.display = 'none';
             }
-
+            
             modal.classList.add('show');
         }
 
-        function closeEventModal() {
-            document.getElementById('eventModal').classList.remove('show');
-            APP_STATE.editingEventId = null;
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+            editingId = null;
         }
 
-        async function saveEvent() {
+        async function handleSave() {
             const title = document.getElementById('eventTitle').value.trim();
             const type = document.getElementById('eventType').value;
             const date = document.getElementById('eventDate').value;
             const time = document.getElementById('eventTime').value;
             const location = document.getElementById('eventLocation').value.trim();
-            const notes = document.getElementById('eventNotes').value.trim();
 
             if (!title || !date || !time) {
-                showToast('Por favor completa los campos obligatorios', 'error');
+                toast('Completa los campos obligatorios', 'error');
                 return;
             }
 
-            if (APP_STATE.editingEventId) {
-                const index = APP_STATE.events.findIndex(e => e.id === APP_STATE.editingEventId);
-                if (index !== -1) {
-                    const updatedEvent = {
-                        ...APP_STATE.events[index],
-                        title, type, date, time, location, notes,
-                        updated_at: new Date().toISOString(),
-                        updated_by: APP_STATE.currentUser
-                    };
-                    APP_STATE.events[index] = updatedEvent;
-                    await updateEventInSupabase(updatedEvent);
-                }
-                showToast('Evento actualizado correctamente');
+            if (editingId) {
+                const idx = events.findIndex(e => e.id === editingId);
+                events[idx] = { ...events[idx], title, type, date, time, location };
+                await updateEvent(events[idx]);
+                toast('Evento actualizado');
             } else {
                 const newEvent = {
-                    id: generateId(),
-                    title, type, date, time, location, notes,
-                    created_at: new Date().toISOString(),
-                    created_by: APP_STATE.currentUser
+                    id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                    title, type, date, time, location,
+                    created_by: currentUser
                 };
-                APP_STATE.events.push(newEvent);
-                await saveEventToSupabase(newEvent);
-                showToast('Evento creado correctamente');
+                events.push(newEvent);
+                await saveEvent(newEvent);
+                toast('Evento creado');
             }
 
-            saveEvents();
-            closeEventModal();
+            closeModal();
             renderCalendar();
-            renderEventsList();
-            scheduleNotification();
+            renderEvents();
         }
 
-        async function deleteEvent() {
-            if (!APP_STATE.editingEventId) return;
-
-            if (confirm('¿Estás seguro de que quieres eliminar este evento?')) {
-                const eventId = APP_STATE.editingEventId;
-                APP_STATE.events = APP_STATE.events.filter(e => e.id !== eventId);
-                await deleteEventFromSupabase(eventId);
-                saveEvents();
-                closeEventModal();
+        async function handleDelete() {
+            if (!editingId) return;
+            if (confirm('¿Eliminar este evento?')) {
+                await deleteEvent(editingId);
+                events = events.filter(e => e.id !== editingId);
+                closeModal();
                 renderCalendar();
-                renderEventsList();
-                showToast('Evento eliminado');
+                renderEvents();
+                toast('Evento eliminado');
             }
         }
 
-        // ========== EXCEL IMPORT ==========
-        function processExcelFile(file) {
+        // ===== EXCEL IMPORT =====
+        function processFile(file) {
             const reader = new FileReader();
-            
             reader.onload = function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
+                    const wb = XLSX.read(data, { type: 'array' });
                     
-                    // Try to find Prebenjamín B data
                     let trainings = [];
-                    
-                    workbook.SheetNames.forEach(sheetName => {
-                        const worksheet = workbook.Sheets[sheetName];
-                        const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+                    const dayMap = { 'lunes': 1, 'martes': 2, 'miercoles': 3, 'miércoles': 3, 'jueves': 4, 'viernes': 5, 'sabado': 6, 'sábado': 6, 'domingo': 0 };
+
+                    wb.SheetNames.forEach(name => {
+                        const sheet = XLSX.utils.sheet_to_json(wb.Sheets[name], { header: 1 });
+                        let found = false;
                         
-                        // Search for Prebenjamín B patterns
-                        const patterns = ['prebenjamin b', 'prebenjamín b', 'pre-benjamin b', 'pre-benjamín b', 'pbenjb', 'preb b'];
-                        const dayPatterns = {
-                            'lunes': 1, 'martes': 2, 'miercoles': 3, 'miércoles': 3,
-                            'jueves': 4, 'viernes': 5, 'sabado': 6, 'sábado': 6, 'domingo': 0
-                        };
-                        
-                        let foundTeam = false;
-                        let currentRow = -1;
-                        
-                        jsonData.forEach((row, rowIndex) => {
+                        sheet.forEach((row, ri) => {
                             const rowStr = row.join(' ').toLowerCase();
+                            if (rowStr.includes('prebenjamin b') || rowStr.includes('prebenjamín b')) found = true;
                             
-                            // Check if this row mentions Prebenjamín B
-                            if (patterns.some(p => rowStr.includes(p))) {
-                                foundTeam = true;
-                                currentRow = rowIndex;
-                            }
-                            
-                            // If we found the team, look for day/time/field info
-                            if (foundTeam && rowIndex >= currentRow && rowIndex <= currentRow + 5) {
-                                row.forEach((cell, colIndex) => {
-                                    if (cell) {
-                                        const cellStr = String(cell).toLowerCase();
-                                        
-                                        // Check for days
-                                        Object.keys(dayPatterns).forEach(day => {
-                                            if (cellStr.includes(day)) {
-                                                // Look for time and field in adjacent cells
-                                                const time = findTime(row, colIndex) || findTime(jsonData[rowIndex + 1] || [], colIndex) || '17:00';
-                                                const field = findField(row, colIndex) || findField(jsonData[rowIndex + 1] || [], colIndex) || '';
-                                                
-                                                trainings.push({
-                                                    day: day.charAt(0).toUpperCase() + day.slice(1),
-                                                    dayNum: dayPatterns[day],
-                                                    time: time,
-                                                    field: field
-                                                });
+                            if (found && ri < sheet.length) {
+                                Object.keys(dayMap).forEach(day => {
+                                    if (rowStr.includes(day)) {
+                                        let time = '17:00', field = '';
+                                        row.forEach(cell => {
+                                            if (cell) {
+                                                const s = String(cell);
+                                                const tm = s.match(/(\d{1,2}):(\d{2})/);
+                                                if (tm) time = tm[0];
+                                                const fm = s.match(/campo?\s*(\d+[a-z]?)/i);
+                                                if (fm) field = fm[1];
                                             }
                                         });
+                                        trainings.push({ day: day.charAt(0).toUpperCase() + day.slice(1), dayNum: dayMap[day], time, field });
                                     }
                                 });
                             }
                         });
                     });
 
-                    // Remove duplicates
-                    trainings = trainings.filter((t, i, arr) => 
-                        arr.findIndex(x => x.dayNum === t.dayNum) === i
-                    );
-
+                    trainings = trainings.filter((t, i, a) => a.findIndex(x => x.dayNum === t.dayNum) === i);
+                    
                     if (trainings.length === 0) {
-                        // If no specific data found, ask user or use default pattern
-                        showToast('No se encontró información específica del Prebenjamín B. Revisa el formato del Excel.', 'warning');
+                        toast('No se encontró información del Prebenjamín B', 'error');
                         return;
                     }
 
-                    APP_STATE.importedTrainings = trainings;
-                    showImportPreview(trainings);
+                    importedData = trainings;
+                    let html = '';
+                    trainings.forEach(t => {
+                        html += '<tr><td>' + t.day + '</td><td>' + t.time + '</td><td>' + (t.field || '-') + '</td></tr>';
+                    });
+                    document.getElementById('previewBody').innerHTML = html;
+                    document.getElementById('preview').classList.add('show');
 
-                } catch (error) {
-                    console.error('Error processing file:', error);
-                    showToast('Error al procesar el archivo. Asegúrate de que es un Excel válido.', 'error');
+                } catch (err) {
+                    console.error(err);
+                    toast('Error al procesar el archivo', 'error');
                 }
             };
-
             reader.readAsArrayBuffer(file);
         }
 
-        function findTime(row, startIndex) {
-            const timePattern = /(\d{1,2}):?(\d{2})?/;
-            for (let i = Math.max(0, startIndex - 2); i < Math.min(row.length, startIndex + 3); i++) {
-                if (row[i]) {
-                    const match = String(row[i]).match(timePattern);
-                    if (match) {
-                        const hours = match[1].padStart(2, '0');
-                        const minutes = match[2] || '00';
-                        return `${hours}:${minutes}`;
-                    }
-                }
-            }
-            return null;
-        }
-
-        function findField(row, startIndex) {
-            const fieldPattern = /campo?\s*(\d+[a-z]?)|(\d+[a-z])/i;
-            for (let i = Math.max(0, startIndex - 2); i < Math.min(row.length, startIndex + 3); i++) {
-                if (row[i]) {
-                    const match = String(row[i]).match(fieldPattern);
-                    if (match) {
-                        return match[1] || match[2] || row[i];
-                    }
-                }
-            }
-            return null;
-        }
-
-        function showImportPreview(trainings) {
-            document.getElementById('importPreview').classList.add('show');
-            document.getElementById('previewCount').textContent = trainings.length;
-
-            const html = trainings.map(t => `
-                <tr>
-                    <td>${t.day}</td>
-                    <td>${t.time}</td>
-                    <td>${t.field || '-'}</td>
-                </tr>
-            `).join('');
-
-            document.getElementById('previewBody').innerHTML = html;
-        }
-
-        function hideImportPreview() {
-            document.getElementById('importPreview').classList.remove('show');
-            document.getElementById('fileInput').value = '';
-            APP_STATE.importedTrainings = [];
-        }
-
         async function confirmImport() {
-            if (APP_STATE.importedTrainings.length === 0) return;
-
-            // Generate events for the next 3 months
             const today = new Date();
-            const endDate = new Date();
-            endDate.setMonth(endDate.getMonth() + 3);
+            const end = new Date();
+            end.setMonth(end.getMonth() + 3);
 
-            let addedCount = 0;
-            const newEvents = [];
-
-            APP_STATE.importedTrainings.forEach(training => {
-                let current = new Date(today);
-                
-                while (current <= endDate) {
-                    if (current.getDay() === training.dayNum) {
-                        const dateStr = formatDate(current);
-                        
-                        // Check if event already exists
-                        const exists = APP_STATE.events.some(e => 
-                            e.date === dateStr && 
-                            e.type === 'training' && 
-                            e.time === training.time
-                        );
-
-                        if (!exists) {
+            let count = 0;
+            for (const t of importedData) {
+                let d = new Date(today);
+                while (d <= end) {
+                    if (d.getDay() === t.dayNum) {
+                        const dateStr = d.toISOString().split('T')[0];
+                        if (!events.some(e => e.date === dateStr && e.type === 'training' && e.time === t.time)) {
                             const newEvent = {
-                                id: generateId(),
+                                id: Date.now().toString(36) + Math.random().toString(36).substr(2) + count,
                                 title: 'Entrenamiento',
                                 type: 'training',
                                 date: dateStr,
-                                time: training.time,
-                                location: training.field ? `Campo ${training.field}` : '',
-                                notes: 'Importado desde Excel',
-                                created_at: new Date().toISOString(),
-                                created_by: APP_STATE.currentUser
+                                time: t.time,
+                                location: t.field ? 'Campo ' + t.field : '',
+                                created_by: currentUser
                             };
-                            APP_STATE.events.push(newEvent);
-                            newEvents.push(newEvent);
-                            addedCount++;
+                            events.push(newEvent);
+                            await saveEvent(newEvent);
+                            count++;
                         }
                     }
-                    current.setDate(current.getDate() + 1);
+                    d.setDate(d.getDate() + 1);
                 }
-            });
-
-            // Guardar todos los eventos nuevos en Supabase
-            for (const event of newEvents) {
-                await saveEventToSupabase(event);
             }
 
-            saveEvents();
-            hideImportPreview();
+            document.getElementById('preview').classList.remove('show');
+            document.getElementById('fileInput').value = '';
+            importedData = [];
             renderCalendar();
-            renderEventsList();
-            showToast(`Se han añadido ${addedCount} entrenamientos al calendario`);
+            renderEvents();
+            toast('Se añadieron ' + count + ' entrenamientos');
         }
 
-        // ========== NOTIFICATIONS ==========
-        async function refreshEvents() {
-            await loadEvents();
-            renderCalendar();
-            renderEventsList();
-        }
-
-        // Auto-refresh cada 30 segundos para sincronizar cambios
-        setInterval(async () => {
-            if (APP_STATE.currentUser) {
-                await refreshEvents();
-            }
-        }, 30000);
-
-        async function requestNotificationPermission() {
-            if ('Notification' in window && Notification.permission === 'default') {
-                const permission = await Notification.requestPermission();
-                return permission === 'granted';
-            }
-            return Notification.permission === 'granted';
-        }
-
-        function scheduleNotification() {
-            // In a real app, this would use Service Workers for background notifications
-            // For demo, we'll use simple setTimeout for events within the current session
-            
-            const settings = {
-                trainingReminder: document.getElementById('trainingReminder').checked,
-                matchReminder: document.getElementById('matchReminder').checked
-            };
-
-            if (!settings.trainingReminder && !settings.matchReminder) return;
-
-            const now = new Date();
-            const upcomingEvents = APP_STATE.events.filter(e => {
-                const eventDate = new Date(`${e.date}T${e.time}`);
-                const diff = eventDate - now;
-                return diff > 0 && diff < 24 * 60 * 60 * 1000; // Within 24 hours
-            });
-
-            upcomingEvents.forEach(event => {
-                const eventDate = new Date(`${event.date}T${event.time}`);
-                const reminderTime = event.type === 'match' ? 2 * 60 * 60 * 1000 : 60 * 60 * 1000;
-                const triggerTime = eventDate - now - reminderTime;
-
-                if (triggerTime > 0) {
-                    setTimeout(() => {
-                        if ('Notification' in window && Notification.permission === 'granted') {
-                            new Notification(`Prebenjamín B - ${event.title}`, {
-                                body: `${event.type === 'match' ? 'En 2 horas' : 'En 1 hora'} - ${event.location || ''}`,
-                                icon: '/icon-192.png',
-                                tag: event.id
-                            });
-                        }
-                    }, triggerTime);
-                }
-            });
-        }
-
-        // ========== TAB NAVIGATION ==========
-        function switchTab(tabId) {
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.classList.toggle('active', tab.dataset.tab === tabId);
-            });
-
-            document.querySelectorAll('.tab-panel').forEach(panel => {
-                panel.classList.toggle('active', panel.id === `${tabId}Panel`);
-            });
-        }
-
-        // ========== EVENT LISTENERS ==========
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check for existing session
-            const savedUser = loadUser();
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check session
+            const savedUser = localStorage.getItem('user');
             if (savedUser && USERS[savedUser]) {
-                APP_STATE.currentUser = savedUser;
+                currentUser = savedUser;
                 showApp();
             }
 
             // Login form
-            document.getElementById('loginForm').addEventListener('submit', (e) => {
+            document.getElementById('loginForm').onsubmit = function(e) {
                 e.preventDefault();
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                
-                const user = login(username, password);
-                if (user) {
+                const user = document.getElementById('username').value;
+                const pass = document.getElementById('password').value;
+                if (login(user, pass)) {
                     showApp();
                 } else {
                     document.getElementById('loginError').classList.add('show');
                 }
-            });
+            };
 
             // Logout
-            document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('logoutBtn').onclick = logout;
 
-            // Tab navigation
-            document.querySelectorAll('.nav-tab').forEach(tab => {
-                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+            // Tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.onclick = function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById(this.dataset.tab + 'Panel').classList.add('active');
+                };
             });
 
-            // Calendar navigation
-            document.getElementById('prevMonth').addEventListener('click', () => navigateMonth(-1));
-            document.getElementById('nextMonth').addEventListener('click', () => navigateMonth(1));
-            document.getElementById('todayBtn').addEventListener('click', goToToday);
+            // Calendar nav
+            document.getElementById('prevMonth').onclick = function() { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); };
+            document.getElementById('nextMonth').onclick = function() { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); };
+            document.getElementById('todayBtn').onclick = function() { currentDate = new Date(); renderCalendar(); };
 
-            // Event modal
-            document.getElementById('addEventBtn').addEventListener('click', () => openEventModal());
-            document.getElementById('closeModal').addEventListener('click', closeEventModal);
-            document.getElementById('saveEvent').addEventListener('click', saveEvent);
-            document.getElementById('deleteEvent').addEventListener('click', deleteEvent);
-            document.getElementById('eventModal').addEventListener('click', (e) => {
-                if (e.target === document.getElementById('eventModal')) {
-                    closeEventModal();
-                }
-            });
+            // Modal
+            document.getElementById('addEventBtn').onclick = function() { openModal(); };
+            document.getElementById('modalClose').onclick = closeModal;
+            document.getElementById('modal').onclick = function(e) { if (e.target === this) closeModal(); };
+            document.getElementById('saveBtn').onclick = handleSave;
+            document.getElementById('deleteBtn').onclick = handleDelete;
 
             // File upload
             const uploadZone = document.getElementById('uploadZone');
             const fileInput = document.getElementById('fileInput');
+            uploadZone.onclick = function() { fileInput.click(); };
+            fileInput.onchange = function() { if (this.files[0]) processFile(this.files[0]); };
+            uploadZone.ondragover = function(e) { e.preventDefault(); this.style.borderColor = '#D4A853'; };
+            uploadZone.ondragleave = function() { this.style.borderColor = '#E5E5E5'; };
+            uploadZone.ondrop = function(e) { e.preventDefault(); this.style.borderColor = '#E5E5E5'; if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]); };
 
-            uploadZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadZone.classList.add('dragover');
-            });
-
-            uploadZone.addEventListener('dragleave', () => {
-                uploadZone.classList.remove('dragover');
-            });
-
-            uploadZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadZone.classList.remove('dragover');
-                const file = e.dataTransfer.files[0];
-                if (file) processExcelFile(file);
-            });
-
-            fileInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) processExcelFile(file);
-            });
-
-            document.getElementById('cancelImport').addEventListener('click', hideImportPreview);
-            document.getElementById('confirmImport').addEventListener('click', confirmImport);
-
-            // Settings
-            document.querySelectorAll('#settingsPanel input[type="checkbox"]').forEach(checkbox => {
-                checkbox.addEventListener('change', () => {
-                    saveSettings();
-                    if (checkbox.id === 'pushNotifications' && checkbox.checked) {
-                        requestNotificationPermission();
-                    }
-                });
-            });
-
-            // Request notification permission if enabled
-            if (document.getElementById('pushNotifications').checked) {
-                requestNotificationPermission();
-            }
+            document.getElementById('cancelImport').onclick = function() { document.getElementById('preview').classList.remove('show'); importedData = []; };
+            document.getElementById('confirmImport').onclick = confirmImport;
         });
-
-        // Register Service Worker for PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('Service Worker registered'))
-                    .catch(err => console.log('Service Worker registration failed:', err));
-            });
-        }
     </script>
 </body>
 </html>
