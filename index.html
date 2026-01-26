@@ -310,9 +310,11 @@
             border-radius: 3px;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            align-self: center;
         }
-        .event-type.training { background: rgba(212,175,55,0.15); color: var(--gold); }
-        .event-type.match { background: rgba(0,0,0,0.08); color: var(--black); }
+        .event-type.training { background: var(--gold); color: var(--black); }
+        .event-type.match { background: #1a5fb4; color: var(--white); }
+        .event-type.meeting { background: var(--gray); color: var(--white); }
 
         /* IMPORT */
         .import-box {
@@ -964,8 +966,9 @@
                 
                 let html = '';
                 trainings.forEach(t => {
-                    const tipo = t.isMatch ? ' (Partido)' : '';
-                    html += '<tr><td>' + t.day + tipo + '</td><td>' + t.time + '</td><td>' + t.field + '</td></tr>';
+                    const tipo = t.isMatch ? ' ⚽ Partido' : '';
+                    const rival = t.opponent ? ' vs ' + t.opponent : '';
+                    html += '<tr><td>' + t.day + tipo + rival + '</td><td>' + t.time + '</td><td>' + t.field + '</td></tr>';
                 });
                 document.getElementById('previewBody').innerHTML = html;
                 document.getElementById('preview').classList.add('show');
@@ -983,14 +986,14 @@
             
             // Unir todo el texto de la fila
             const rowText = rowItems.map(i => i.text).join(' ');
-            console.log('Texto de la fila:', rowText);
+            console.log('Texto de la fila Prebenjamin B:', rowText);
             
             // Buscar patrones de entrenamiento: "Entrenamiento Campo X-Y Hora: HH:MM"
-            const regex = /Entrenamiento\s+Campo\s+(\d+)\s*-?\s*([A-Za-z]?)\s+Hora:\s*(\d{1,2}):(\d{2})/gi;
+            const entrenamientoRegex = /Entrenamiento\s+Campo\s+(\d+)\s*-?\s*([A-Za-z]?)\s+Hora:\s*(\d{1,2}):(\d{2})/gi;
             let match;
             let dayIndex = 0;
             
-            while ((match = regex.exec(rowText)) !== null) {
+            while ((match = entrenamientoRegex.exec(rowText)) !== null) {
                 const field = match[1] + (match[2] ? '-' + match[2].toUpperCase() : '');
                 const time = match[3].padStart(2, '0') + ':' + match[4];
                 
@@ -1004,13 +1007,19 @@
                 dayIndex++;
             }
             
-            // Buscar partidos (Jornada)
-            const jornadaRegex = /Jornada\s+(\d+)\s+([^C]*?)Campo\s+(\d+)\s*-?\s*([A-Za-z]?)\s*[\|]?\s*Hora:\s*(\d{1,2}):(\d{2})/gi;
+            // Buscar partidos: "Jornada X RIVAL Campo Y Hora: HH:MM" o variantes
+            // Ejemplo: "Jornada 10 C.D. San Roque E.F.F. Prebenjamin A Campo 9 - B | Hora: 18:30"
+            const jornadaRegex = /Jornada\s+(\d+)\s+([A-Za-z\.\s]+?)(?:Campo|Hora)\s*(\d+)?\s*-?\s*([A-Za-z]?)?\s*[\|]?\s*Hora:\s*(\d{1,2}):(\d{2})/gi;
             let jMatch;
             
             while ((jMatch = jornadaRegex.exec(rowText)) !== null) {
-                const field = jMatch[3] + (jMatch[4] ? '-' + jMatch[4].toUpperCase() : '');
+                const jornada = jMatch[1];
+                let opponent = jMatch[2].trim();
+                const field = jMatch[3] ? jMatch[3] + (jMatch[4] ? '-' + jMatch[4].toUpperCase() : '') : '';
                 const time = jMatch[5].padStart(2, '0') + ':' + jMatch[6];
+                
+                // Limpiar nombre del rival
+                opponent = opponent.replace(/Prebenjamin.*$/i, '').trim();
                 
                 trainings.push({
                     day: 'Sábado',
@@ -1018,7 +1027,31 @@
                     time: time,
                     field: field,
                     isMatch: true,
-                    opponent: jMatch[2].trim()
+                    opponent: opponent,
+                    jornada: jornada
+                });
+            }
+            
+            // Buscar también formato alternativo: "Jornada 10 RIVAL | Hora: HH:MM"
+            const jornadaAltRegex = /Jornada\s+(\d+)\s+([^|]+?)\s+Campo\s+(\d+)\s*-?\s*([A-Za-z]?)\s*\|\s*Hora:\s*(\d{1,2}):(\d{2})/gi;
+            let jAltMatch;
+            
+            while ((jAltMatch = jornadaAltRegex.exec(rowText)) !== null) {
+                // Evitar duplicados
+                const time = jAltMatch[5].padStart(2, '0') + ':' + jAltMatch[6];
+                if (trainings.some(t => t.isMatch && t.time === time)) continue;
+                
+                const field = jAltMatch[3] + (jAltMatch[4] ? '-' + jAltMatch[4].toUpperCase() : '');
+                let opponent = jAltMatch[2].trim().replace(/Prebenjamin.*$/i, '').trim();
+                
+                trainings.push({
+                    day: 'Sábado',
+                    dayNum: 6,
+                    time: time,
+                    field: field,
+                    isMatch: true,
+                    opponent: opponent,
+                    jornada: jAltMatch[1]
                 });
             }
             
@@ -1028,42 +1061,39 @@
         async function confirmImport() {
             if (importedData.length === 0) return;
             
+            // Obtener las fechas de la semana del PDF (se extraen del título)
+            // Por defecto usar la semana actual
             const today = new Date();
-            const end = new Date();
-            end.setMonth(end.getMonth() + 3);
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Lunes de esta semana
 
             let count = 0;
             
             for (const t of importedData) {
-                let d = new Date(today);
-                while (d <= end) {
-                    // Convertir dayNum: 1=Lunes ... 6=Sábado, 0=Domingo
-                    const jsDay = t.dayNum === 0 ? 0 : t.dayNum; // JS: 0=Dom, 1=Lun...6=Sáb
-                    const targetDay = t.dayNum === 0 ? 0 : t.dayNum; // Nuestro formato ya coincide parcialmente
-                    
-                    // Ajustar: nuestro 1=Lunes, JS 1=Lunes, OK
-                    // Nuestro 0=Domingo, JS 0=Domingo, OK
-                    if (d.getDay() === (t.dayNum === 0 ? 0 : t.dayNum)) {
-                        const dateStr = d.toISOString().split('T')[0];
-                        const eventType = t.isMatch ? 'match' : 'training';
-                        const eventTitle = t.isMatch ? 'Partido' : 'Entrenamiento';
-                        
-                        if (!events.some(e => e.date === dateStr && e.type === eventType && e.time === t.time)) {
-                            const newEvent = {
-                                id: Date.now().toString(36) + Math.random().toString(36).substr(2) + count,
-                                title: eventTitle,
-                                type: eventType,
-                                date: dateStr,
-                                time: t.time,
-                                location: 'Campo ' + t.field,
-                                created_by: currentUser
-                            };
-                            events.push(newEvent);
-                            await saveEvent(newEvent);
-                            count++;
-                        }
-                    }
-                    d.setDate(d.getDate() + 1);
+                // Calcular la fecha exacta de esta semana
+                const eventDate = new Date(startOfWeek);
+                // dayNum: 1=Lunes, 2=Martes... 6=Sábado, 0=Domingo
+                const daysToAdd = t.dayNum === 0 ? 6 : t.dayNum - 1;
+                eventDate.setDate(startOfWeek.getDate() + daysToAdd);
+                
+                const dateStr = eventDate.toISOString().split('T')[0];
+                const eventType = t.isMatch ? 'match' : 'training';
+                const eventTitle = t.isMatch ? (t.opponent ? 'vs ' + t.opponent : 'Partido') : 'Entrenamiento';
+                
+                // Verificar que no exista ya
+                if (!events.some(e => e.date === dateStr && e.type === eventType && e.time === t.time)) {
+                    const newEvent = {
+                        id: Date.now().toString(36) + Math.random().toString(36).substr(2) + count,
+                        title: eventTitle,
+                        type: eventType,
+                        date: dateStr,
+                        time: t.time,
+                        location: 'Campo ' + t.field,
+                        created_by: currentUser
+                    };
+                    events.push(newEvent);
+                    await saveEvent(newEvent);
+                    count++;
                 }
             }
 
@@ -1072,7 +1102,7 @@
             importedData = [];
             renderCalendar();
             renderEvents();
-            toast('Se añadieron ' + count + ' eventos');
+            toast('Se añadieron ' + count + ' eventos de esta semana');
         }
 
         // ===== INIT =====
