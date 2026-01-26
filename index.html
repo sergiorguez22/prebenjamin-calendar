@@ -874,6 +874,8 @@
                     fullText += pageText + '\n';
                 }
 
+                console.log('PDF Text:', fullText); // Debug
+
                 // Parse trainings from text
                 const trainings = parseTrainings(fullText);
                 
@@ -885,7 +887,8 @@
                 importedData = trainings;
                 let html = '';
                 trainings.forEach(t => {
-                    html += '<tr><td>' + t.day + '</td><td>' + t.time + '</td><td>' + (t.field || '—') + '</td></tr>';
+                    const typeLabel = t.type === 'match' ? ' (Partido)' : '';
+                    html += '<tr><td>' + t.day + typeLabel + '</td><td>' + t.time + '</td><td>' + (t.field || '—') + '</td></tr>';
                 });
                 document.getElementById('previewBody').innerHTML = html;
                 document.getElementById('preview').classList.add('show');
@@ -898,59 +901,75 @@
 
         function parseTrainings(text) {
             const trainings = [];
-            const dayMap = { 
-                'lunes': 1, 'martes': 2, 'miercoles': 3, 'miércoles': 3, 
-                'jueves': 4, 'viernes': 5, 'sabado': 6, 'sábado': 6, 'domingo': 0 
-            };
             
-            const textLower = text.toLowerCase();
+            // Normalize whitespace
+            const normalized = text.replace(/\s+/g, ' ');
             
-            // Check if Prebenjamín B is mentioned
-            if (!textLower.includes('prebenjamin b') && !textLower.includes('prebenjamín b') && !textLower.includes('pre-benjamín b') && !textLower.includes('pre-benjamin b')) {
+            // Find the Prebenjamin B row data
+            // The PDF structure has: "Prebenjamin B" followed by data for each day column
+            
+            // Look for pattern: Prebenjamin B ... (training data) ... Debutante
+            const prebMatch = normalized.match(/Prebenjamin\s*B\s+(.*?)(?=Debutante|$)/i);
+            
+            if (!prebMatch) {
+                console.log('No Prebenjamin B section found');
                 return trainings;
             }
-
-            // Find days and times
-            const lines = text.split(/[\n\r]+/);
-            let inPrebSection = false;
             
-            for (const line of lines) {
-                const lineLower = line.toLowerCase();
-                
-                if (lineLower.includes('prebenjamin b') || lineLower.includes('prebenjamín b')) {
-                    inPrebSection = true;
-                }
-                
-                if (inPrebSection) {
-                    for (const [dayName, dayNum] of Object.entries(dayMap)) {
-                        if (lineLower.includes(dayName)) {
-                            // Find time pattern
-                            const timeMatch = line.match(/(\d{1,2})[:\.](\d{2})/);
-                            const time = timeMatch ? timeMatch[1].padStart(2, '0') + ':' + timeMatch[2] : '17:00';
-                            
-                            // Find field pattern
-                            const fieldMatch = line.match(/campo\s*(\d+[a-z]?)/i) || line.match(/(\d+[a-z])\s*$/i);
-                            const field = fieldMatch ? fieldMatch[1].toUpperCase() : '';
-                            
-                            // Avoid duplicates
-                            if (!trainings.some(t => t.dayNum === dayNum)) {
-                                trainings.push({
-                                    day: dayName.charAt(0).toUpperCase() + dayName.slice(1),
-                                    dayNum,
-                                    time,
-                                    field
-                                });
-                            }
-                        }
-                    }
-                }
-                
-                // Stop if we hit another team section
-                if (inPrebSection && (lineLower.includes('benjamin') || lineLower.includes('benjamín')) && !lineLower.includes('prebenjamin') && !lineLower.includes('prebenjamín')) {
-                    break;
-                }
+            const section = prebMatch[1];
+            console.log('Prebenjamin B section:', section);
+            
+            // Find all "Entrenamiento Campo X-X Hora: HH:MM" patterns
+            const allTrainings = [];
+            const trainingRegex = /Entrenamiento\s+Campo\s+(\d+\s*-?\s*[A-Za-z]?)\s+Hora:\s*(\d{1,2}):(\d{2})/gi;
+            let match;
+            
+            while ((match = trainingRegex.exec(section)) !== null) {
+                const field = match[1].replace(/\s+/g, '').toUpperCase();
+                const time = match[2].padStart(2, '0') + ':' + match[3];
+                allTrainings.push({ field, time });
             }
-
+            
+            console.log('Found trainings:', allTrainings);
+            
+            // Based on the PDF structure, Prebenjamin B trains:
+            // Column order: Lunes, Martes, Miércoles, Jueves, Viernes, Sábado, Domingo
+            // From the PDF we can see: Lunes (8-B, 18:45), Martes (8-B, 18:45), Miércoles (5-B, 18:30)
+            
+            const dayNames = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+            const dayNums = [1, 2, 3, 4, 5, 6, 0];
+            
+            // Assign trainings to days in order
+            allTrainings.forEach((t, idx) => {
+                if (idx < dayNames.length) {
+                    trainings.push({
+                        day: dayNames[idx],
+                        dayNum: dayNums[idx],
+                        time: t.time,
+                        field: t.field,
+                        type: 'training'
+                    });
+                }
+            });
+            
+            // Also check for match (Jornada)
+            const jornadaMatch = section.match(/Jornada\s+\d+\s+(.*?)\s+Campo\s+([\d\w\-]+)\s*\|?\s*Hora:\s*(\d{1,2}):(\d{2})/i);
+            if (jornadaMatch) {
+                const opponent = jornadaMatch[1].trim();
+                const field = jornadaMatch[2].replace(/\s+/g, '').toUpperCase();
+                const time = jornadaMatch[3].padStart(2, '0') + ':' + jornadaMatch[4];
+                
+                // Find which day (usually Sábado or Domingo based on position)
+                trainings.push({
+                    day: 'Sábado',
+                    dayNum: 6,
+                    time: time,
+                    field: field,
+                    type: 'match',
+                    opponent: opponent
+                });
+            }
+            
             return trainings;
         }
 
