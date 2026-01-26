@@ -247,6 +247,12 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .event-dot:hover {
+            transform: scale(1.05);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         .event-dot.training { background: var(--gold); color: var(--white); }
         .event-dot.match { background: var(--black); color: var(--white); }
@@ -782,7 +788,7 @@
                 html += '<div class="day' + (isToday ? ' today' : '') + '" data-date="' + dateStr + '">';
                 html += '<div class="day-num">' + d + '</div>';
                 dayEvents.slice(0, 2).forEach(e => {
-                    html += '<div class="event-dot ' + e.type + '">' + e.title + '</div>';
+                    html += '<div class="event-dot ' + e.type + '" data-event-id="' + e.id + '">' + e.title + '</div>';
                 });
                 if (dayEvents.length > 2) html += '<div class="event-dot" style="background:#eee;color:#666;">+' + (dayEvents.length - 2) + '</div>';
                 html += '</div>';
@@ -795,8 +801,22 @@
 
             document.getElementById('calendarDays').innerHTML = html;
 
+            // Click en día vacío para añadir evento
             document.querySelectorAll('.day:not(.other)').forEach(day => {
-                day.onclick = () => openModal(null, day.dataset.date);
+                day.onclick = (e) => {
+                    // Solo abrir modal de nuevo evento si no se hizo click en un evento existente
+                    if (!e.target.classList.contains('event-dot')) {
+                        openModal(null, day.dataset.date);
+                    }
+                };
+            });
+            
+            // Click en evento para editarlo
+            document.querySelectorAll('.event-dot[data-event-id]').forEach(dot => {
+                dot.onclick = (e) => {
+                    e.stopPropagation();
+                    openModal(dot.dataset.eventId);
+                };
             });
         }
 
@@ -1008,13 +1028,16 @@
                 eventIndex++;
             }
             
-            // 2. Buscar partidos - formato del PDF: "RIVAL Campo X - Y | Hora: HH:MM Jornada N"
-            // Ejemplo: "C.D. San Roque E.F.F. Prebenjamin A Campo 9 - B | Hora: 18:30 Jornada 10"
-            const partidoRegex = /([A-Z][A-Za-z\.\s]+?)\s+Campo\s+(\d+)\s*-\s*([A-Za-z])\s*\|\s*Hora:\s*(\d{1,2}):(\d{2})\s+Jornada\s+(\d+)/gi;
+            // 2. Buscar partidos - varios formatos posibles
+            // Formato: "... Campo X - Y | Hora: HH:MM Jornada N" o "... Campo X - Y Hora: HH:MM Jornada N"
+            const partidoRegex = /([A-Z][A-Za-z\.\s]+?(?:Prebenjamin|Prebenjamín)\s*[AB]?)\s+Campo\s+(\d+)\s*-\s*([A-Za-z])\s*\|?\s*Hora:\s*(\d{1,2}):(\d{2})\s*Jornada\s+(\d+)/gi;
             let pMatch;
             
             while ((pMatch = partidoRegex.exec(rowText)) !== null) {
                 let opponent = pMatch[1].trim();
+                // Limpiar el nombre del rival
+                opponent = opponent.replace(/\s*(Prebenjamin|Prebenjamín)\s*[AB]?\s*$/i, '').trim();
+                
                 const field = pMatch[2] + '-' + pMatch[3].toUpperCase();
                 const time = pMatch[4].padStart(2, '0') + ':' + pMatch[5];
                 const jornada = pMatch[6];
