@@ -360,6 +360,52 @@
             text-decoration: none;
         }
 
+        /* IMPORTAR PANEL */
+        .importar-panel { padding: 20px; }
+        .importar-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+        .importar-desc {
+            font-size: 13px;
+            color: var(--gray);
+            margin-bottom: 24px;
+        }
+        .upload-zone {
+            background: var(--white);
+            border: 2px dashed var(--gray-light);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .upload-zone:hover { border-color: var(--gold); }
+        .upload-zone input { display: none; }
+        .upload-icon { font-size: 40px; margin-bottom: 12px; }
+        .upload-text { font-weight: 500; margin-bottom: 4px; }
+        .upload-hint { font-size: 12px; color: var(--gray); }
+        .import-status {
+            background: var(--white);
+            border: 1px solid var(--gray-light);
+            padding: 24px;
+            text-align: center;
+            margin-top: 16px;
+        }
+        .status-icon { font-size: 32px; margin-bottom: 8px; }
+        .status-text { font-size: 14px; color: var(--gray); }
+        .import-preview { margin-top: 24px; }
+        .preview-item {
+            background: var(--white);
+            border: 1px solid var(--gray-light);
+            padding: 12px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .preview-date { font-weight: 600; color: var(--black); }
+        .preview-title { color: var(--gray); }
+
         /* MODAL */
         .modal {
             display: none;
@@ -574,6 +620,32 @@
                     <div class="players-grid" id="playersGrid"></div>
                 </div>
             </div>
+
+            <!-- IMPORTAR Panel -->
+            <div class="panel" id="importarPanel">
+                <div class="importar-panel">
+                    <div class="importar-title">IMPORTAR CALENDARIO</div>
+                    <p class="importar-desc">Sube el PDF del calendario mensual para importar todos los eventos automáticamente.</p>
+                    
+                    <div class="upload-zone" id="uploadZone">
+                        <input type="file" id="pdfInput" accept=".pdf">
+                        <div class="upload-icon">📄</div>
+                        <div class="upload-text">Pulsa para subir PDF</div>
+                        <div class="upload-hint">Formato: Calendario mensual del equipo</div>
+                    </div>
+
+                    <div class="import-status" id="importStatus" style="display:none;">
+                        <div class="status-icon">⏳</div>
+                        <div class="status-text">Procesando...</div>
+                    </div>
+
+                    <div class="import-preview" id="importPreview" style="display:none;">
+                        <div class="events-title">EVENTOS ENCONTRADOS</div>
+                        <div id="previewList"></div>
+                        <button class="btn-primary" id="confirmImport" style="margin-top:16px;">IMPORTAR TODOS</button>
+                    </div>
+                </div>
+            </div>
         </main>
 
         <!-- Bottom Navigation -->
@@ -584,11 +656,15 @@
             </button>
             <button class="nav-item" data-panel="calendario">
                 <span class="icon">🗓️</span>
-                <span>Calendario</span>
+                <span>Mes</span>
+            </button>
+            <button class="nav-item" data-panel="importar">
+                <span class="icon">📤</span>
+                <span>Importar</span>
             </button>
             <button class="nav-item" data-panel="plantilla">
                 <span class="icon">👥</span>
-                <span>Plantilla</span>
+                <span>Equipo</span>
             </button>
         </nav>
 
@@ -1143,6 +1219,209 @@
             }
         }
 
+        // ===== PDF IMPORT =====
+        let pendingImport = [];
+
+        async function processPDF(file) {
+            document.getElementById('uploadZone').style.display = 'none';
+            document.getElementById('importStatus').style.display = 'block';
+            document.getElementById('importPreview').style.display = 'none';
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                
+                let allText = [];
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const content = await page.getTextContent();
+                    content.items.forEach(item => {
+                        allText.push({
+                            text: item.str,
+                            x: item.transform[4],
+                            y: item.transform[5]
+                        });
+                    });
+                }
+
+                pendingImport = parsePDFEvents(allText);
+                
+                document.getElementById('importStatus').style.display = 'none';
+                
+                if (pendingImport.length > 0) {
+                    renderPreview();
+                    document.getElementById('importPreview').style.display = 'block';
+                } else {
+                    toast('No se encontraron eventos en el PDF');
+                    resetUpload();
+                }
+            } catch (e) {
+                console.error('Error procesando PDF:', e);
+                toast('Error al procesar el PDF');
+                resetUpload();
+            }
+        }
+
+        function parsePDFEvents(textItems) {
+            const events = [];
+            
+            // Sort by Y (top to bottom), then X (left to right)
+            textItems.sort((a, b) => {
+                const yDiff = b.y - a.y;
+                if (Math.abs(yDiff) > 5) return yDiff;
+                return a.x - b.x;
+            });
+
+            // Detectar mes y año del PDF
+            let pdfMonth = null;
+            let pdfYear = 2026;
+            const monthNames = {
+                'enero': 1, 'febrero': 2, 'marzo': 3, 'abril': 4,
+                'mayo': 5, 'junio': 6, 'julio': 7, 'agosto': 8,
+                'septiembre': 9, 'octubre': 10, 'noviembre': 11, 'diciembre': 12
+            };
+
+            for (const item of textItems) {
+                const text = item.text.toLowerCase();
+                for (const [name, num] of Object.entries(monthNames)) {
+                    if (text.includes(name)) {
+                        pdfMonth = num;
+                        const yearMatch = text.match(/20\d{2}/);
+                        if (yearMatch) pdfYear = parseInt(yearMatch[0]);
+                        break;
+                    }
+                }
+                if (pdfMonth) break;
+            }
+
+            if (!pdfMonth) {
+                pdfMonth = new Date().getMonth() + 1;
+            }
+
+            // Buscar patrones de eventos
+            // Patrón: número de día seguido de texto de evento
+            const dayPattern = /^(\d{1,2})$/;
+            const timePattern = /(\d{1,2})[:\.](\d{2})/;
+            
+            let currentDay = null;
+            let currentText = [];
+            
+            for (let i = 0; i < textItems.length; i++) {
+                const item = textItems[i];
+                const text = item.text.trim();
+                
+                // Si es un número de día (1-31)
+                const dayMatch = text.match(dayPattern);
+                if (dayMatch && parseInt(dayMatch[1]) >= 1 && parseInt(dayMatch[1]) <= 31) {
+                    // Guardar evento anterior si existe
+                    if (currentDay && currentText.length > 0) {
+                        const eventData = parseEventText(currentText.join(' '), currentDay, pdfMonth, pdfYear);
+                        if (eventData) events.push(eventData);
+                    }
+                    currentDay = parseInt(dayMatch[1]);
+                    currentText = [];
+                } else if (currentDay && text.length > 1) {
+                    // Filtrar textos no relevantes
+                    const lower = text.toLowerCase();
+                    if (!['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom', 'l', 'm', 'x', 'j', 'v', 's', 'd'].includes(lower) &&
+                        !Object.keys(monthNames).some(m => lower.includes(m))) {
+                        currentText.push(text);
+                    }
+                }
+            }
+            
+            // Último evento
+            if (currentDay && currentText.length > 0) {
+                const eventData = parseEventText(currentText.join(' '), currentDay, pdfMonth, pdfYear);
+                if (eventData) events.push(eventData);
+            }
+
+            return events;
+        }
+
+        function parseEventText(text, day, month, year) {
+            if (!text || text.length < 3) return null;
+            
+            // Extraer hora si existe
+            let time = null;
+            const timeMatch = text.match(/(\d{1,2})[:\.](\d{2})/);
+            if (timeMatch) {
+                time = `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
+                text = text.replace(timeMatch[0], '').trim();
+            }
+
+            // Detectar tipo
+            let type = 'meeting';
+            const lower = text.toLowerCase();
+            if (lower.includes('entrena') || lower.includes('training')) {
+                type = 'training';
+                if (!text || lower === 'entrenamiento') text = 'Entrenamiento';
+            } else if (lower.includes('partido') || lower.includes('vs') || lower.includes('c.d.') || lower.includes('f.c.') || lower.includes('u.d.')) {
+                type = 'match';
+            }
+
+            // Limpiar título
+            let title = text.replace(/\s+/g, ' ').trim();
+            if (title.length < 2) return null;
+
+            // Capitalizar primera letra
+            title = title.charAt(0).toUpperCase() + title.slice(1);
+
+            const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+            return { title, type, date: dateStr, time, location: null };
+        }
+
+        function renderPreview() {
+            let html = '';
+            pendingImport.forEach((e, idx) => {
+                const [y, m, d] = e.date.split('-');
+                const typeLabel = e.type === 'training' ? '🏃 Entreno' : e.type === 'match' ? '⚽ Partido' : '📌 Evento';
+                html += `
+                    <div class="preview-item">
+                        <span class="preview-date">${parseInt(d)}/${m}</span>
+                        ${e.time ? `<span style="color:var(--gray);"> ${e.time}</span>` : ''}
+                        <span class="preview-title"> - ${e.title}</span>
+                        <span style="float:right;font-size:11px;">${typeLabel}</span>
+                    </div>
+                `;
+            });
+            document.getElementById('previewList').innerHTML = html;
+        }
+
+        async function confirmImport() {
+            let count = 0;
+            for (const e of pendingImport) {
+                // Evitar duplicados
+                const exists = events.some(ex => ex.date === e.date && ex.title === e.title);
+                if (!exists) {
+                    const newEvent = {
+                        id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+                        ...e,
+                        created_by: currentUser
+                    };
+                    events.push(newEvent);
+                    await saveEvent(newEvent);
+                    count++;
+                }
+            }
+            
+            toast(`${count} eventos importados`);
+            pendingImport = [];
+            resetUpload();
+            renderTodayView();
+            renderCalendar();
+            switchPanel('hoy');
+        }
+
+        function resetUpload() {
+            document.getElementById('uploadZone').style.display = 'block';
+            document.getElementById('importStatus').style.display = 'none';
+            document.getElementById('importPreview').style.display = 'none';
+            document.getElementById('pdfInput').value = '';
+        }
+
         // ===== PWA INSTALL =====
         let deferredPrompt = null;
 
@@ -1236,6 +1515,17 @@
 
             // Notifications
             document.getElementById('notifBtn').onclick = requestNotifications;
+
+            // PDF Import
+            document.getElementById('uploadZone').onclick = () => {
+                document.getElementById('pdfInput').click();
+            };
+            document.getElementById('pdfInput').onchange = (e) => {
+                if (e.target.files[0]) {
+                    processPDF(e.target.files[0]);
+                }
+            };
+            document.getElementById('confirmImport').onclick = confirmImport;
 
             // Install
             document.getElementById('installBtn').onclick = installPWA;
