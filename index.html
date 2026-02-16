@@ -560,6 +560,7 @@
                 <span class="header-title">PREBENJAMÍN B</span>
             </div>
             <div class="header-right">
+                <button class="header-btn" id="refreshBtn" title="Actualizar">🔄</button>
                 <button class="header-btn notif" id="notifBtn" title="Notificaciones">🔔</button>
                 <button class="header-btn" id="logoutBtn" title="Cerrar sesión">⏻</button>
             </div>
@@ -781,38 +782,71 @@
 
         // ===== SUPABASE =====
         async function loadEvents() {
+            // Primero cargar de localStorage como backup
+            const localEvents = JSON.parse(localStorage.getItem('events') || '[]');
+            
             try {
                 const res = await fetch(`${SUPABASE_URL}/rest/v1/events?select=*`, {
                     headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
                 });
-                events = await res.json();
+                
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+                
+                const data = await res.json();
+                
+                // Verificar que sea un array válido
+                if (Array.isArray(data)) {
+                    events = data;
+                    // Guardar en localStorage como backup
+                    localStorage.setItem('events', JSON.stringify(events));
+                    console.log('✓ Eventos cargados de Supabase:', events.length);
+                } else {
+                    throw new Error('Respuesta no es array');
+                }
             } catch (e) {
-                console.log('Error loading events:', e);
-                events = JSON.parse(localStorage.getItem('events') || '[]');
+                console.log('⚠ Error cargando de Supabase, usando localStorage:', e.message);
+                events = localEvents;
+                toast('Modo offline - usando datos locales');
             }
         }
 
         async function saveEvent(event) {
+            // Siempre guardar en localStorage primero
+            localStorage.setItem('events', JSON.stringify(events));
+            
             try {
-                await fetch(`${SUPABASE_URL}/rest/v1/events`, {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/events`, {
                     method: 'POST',
                     headers: {
                         'apikey': SUPABASE_KEY,
                         'Authorization': `Bearer ${SUPABASE_KEY}`,
                         'Content-Type': 'application/json',
-                        'Prefer': 'return=minimal'
+                        'Prefer': 'return=representation'
                     },
                     body: JSON.stringify(event)
                 });
+                
+                if (!res.ok) {
+                    const errorText = await res.text();
+                    console.log('Error guardando en Supabase:', res.status, errorText);
+                    // Marcar para sincronizar después
+                    markPendingSync(event.id, 'create');
+                } else {
+                    console.log('✓ Evento guardado en Supabase');
+                }
             } catch (e) {
-                console.log('Error saving:', e);
+                console.log('⚠ Error de red guardando:', e.message);
+                markPendingSync(event.id, 'create');
             }
-            localStorage.setItem('events', JSON.stringify(events));
         }
 
         async function updateEvent(id, data) {
+            localStorage.setItem('events', JSON.stringify(events));
+            
             try {
-                await fetch(`${SUPABASE_URL}/rest/v1/events?id=eq.${id}`, {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/events?id=eq.${id}`, {
                     method: 'PATCH',
                     headers: {
                         'apikey': SUPABASE_KEY,
@@ -821,22 +855,90 @@
                     },
                     body: JSON.stringify(data)
                 });
+                
+                if (!res.ok) {
+                    console.log('Error actualizando en Supabase:', res.status);
+                    markPendingSync(id, 'update');
+                } else {
+                    console.log('✓ Evento actualizado en Supabase');
+                }
             } catch (e) {
-                console.log('Error updating:', e);
+                console.log('⚠ Error de red actualizando:', e.message);
+                markPendingSync(id, 'update');
             }
-            localStorage.setItem('events', JSON.stringify(events));
         }
 
-        async function deleteEvent(id) {
+        async function deleteEventFromDB(id) {
+            localStorage.setItem('events', JSON.stringify(events));
+            
             try {
-                await fetch(`${SUPABASE_URL}/rest/v1/events?id=eq.${id}`, {
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/events?id=eq.${id}`, {
                     method: 'DELETE',
                     headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
                 });
+                
+                if (!res.ok) {
+                    console.log('Error eliminando en Supabase:', res.status);
+                } else {
+                    console.log('✓ Evento eliminado de Supabase');
+                }
             } catch (e) {
-                console.log('Error deleting:', e);
+                console.log('⚠ Error de red eliminando:', e.message);
             }
-            localStorage.setItem('events', JSON.stringify(events));
+        }
+
+        // Marcar eventos pendientes de sincronizar
+        function markPendingSync(id, action) {
+            const pending = JSON.parse(localStorage.getItem('pendingSync') || '[]');
+            if (!pending.find(p => p.id === id)) {
+                pending.push({ id, action, timestamp: Date.now() });
+                localStorage.setItem('pendingSync', JSON.stringify(pending));
+            }
+        }
+
+        // Intentar sincronizar pendientes
+        async function syncPending() {
+            const pending = JSON.parse(localStorage.getItem('pendingSync') || '[]');
+            if (pending.length === 0) return;
+            
+            console.log('Sincronizando', pending.length, 'eventos pendientes...');
+            const stillPending = [];
+            
+            for (const item of pending) {
+                const event = events.find(e => e.id === item.id);
+                if (!event && item.action !== 'delete') continue;
+                
+                try {
+                    if (item.action === 'create' && event) {
+                        const res = await fetch(`${SUPABASE_URL}/rest/v1/events`, {
+                            method: 'POST',
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Content-Type': 'application/json',
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify(event)
+                        });
+                        if (!res.ok) stillPending.push(item);
+                    }
+                } catch (e) {
+                    stillPending.push(item);
+                }
+            }
+            
+            localStorage.setItem('pendingSync', JSON.stringify(stillPending));
+            if (stillPending.length < pending.length) {
+                console.log('✓ Sincronizados', pending.length - stillPending.length, 'eventos');
+            }
+        }
+
+        // Refrescar eventos desde servidor
+        async function refreshEvents() {
+            await loadEvents();
+            renderTodayView();
+            renderCalendar();
+            toast('Eventos actualizados');
         }
 
         // ===== AUTH =====
@@ -1094,7 +1196,7 @@
         async function handleDelete() {
             if (!editingId) return;
             events = events.filter(e => e.id !== editingId);
-            await deleteEvent(editingId);
+            await deleteEventFromDB(editingId);
             toast('Evento eliminado');
             closeModal();
             renderTodayView();
@@ -1470,6 +1572,9 @@
             // Logout
             document.getElementById('logoutBtn').onclick = logout;
 
+            // Refresh
+            document.getElementById('refreshBtn').onclick = refreshEvents;
+
             // Navigation
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.onclick = () => switchPanel(item.dataset.panel);
@@ -1541,6 +1646,24 @@
                     banner.querySelector('#installBtn').style.display = 'none';
                     banner.classList.add('show');
                 }, 5000);
+            }
+        });
+
+        // Sincronizar cuando la app vuelve a primer plano
+        document.addEventListener('visibilitychange', async () => {
+            if (document.visibilityState === 'visible' && currentUser) {
+                console.log('App visible, sincronizando...');
+                await syncPending();
+                await loadEvents();
+                renderTodayView();
+                renderCalendar();
+            }
+        });
+
+        // También al hacer focus en la ventana
+        window.addEventListener('focus', async () => {
+            if (currentUser) {
+                await syncPending();
             }
         });
 
